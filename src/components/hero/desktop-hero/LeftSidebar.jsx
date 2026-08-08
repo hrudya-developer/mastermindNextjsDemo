@@ -167,10 +167,10 @@ export default function LeftSidebar() {
                   className="
                     whitespace-nowrap
                     text-center
-                    text-[11px]
+                    text-[13px]
                     font-medium
                     leading-tight
-                    text-[#2c2b2b]/80
+                    text-black/90
 
                     transition-colors
                     duration-300

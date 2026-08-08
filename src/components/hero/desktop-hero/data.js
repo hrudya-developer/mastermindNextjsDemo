@@ -1,35 +1,35 @@
 export const leftMenu = [
-    {
-      label: "Home",
-      icon: "⌂",
-      href: "/",
-    },
-    {
-      label: "Courses",
-      icon: "▤",
-      href: "#courses",
-    },
-    {
-      label: "Live Classes",
-      icon: "▣",
-      href: "#live-classes",
-    },
-    {
-      label: "Test Series",
-      icon: "▦",
-      href: "#test-series",
-    },
-    {
-      label: "Current Affairs",
-      icon: "◎",
-      href: "#current-affairs",
-    },
-    {
-      label: "Downloads",
-      icon: "⇩",
-      href: "#downloads",
-    },
-  ];
+  {
+    label: "Home",
+    href: "/",
+    icon: "⌂",
+  },
+  {
+    label: "About",
+    href: "#about",
+    icon: "ⓘ",
+  },
+  {
+    label: "Testimonials",
+    href: "#testimonials",
+    icon: "★",
+  },
+  {
+    label: "Blogs",
+    href: "#blogs",
+    icon: "▤",
+  },
+  {
+    label: "News",
+    href: "#news",
+    icon: "◉",
+  },
+  {
+    label: "Contact",
+    href: "#contact",
+    icon: "✉",
+  },
+];
   
   export const exploreItems = [
     {

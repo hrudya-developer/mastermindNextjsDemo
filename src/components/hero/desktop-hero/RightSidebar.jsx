@@ -21,7 +21,7 @@ export default function RightSidebar() {
       <div className="flex items-start justify-between">
         <div>
           <h2 className="text-xl font-bold text-[#164fa5]">
-            Explore
+            Learning Hub
           </h2>
 
           <p className="mt-1 text-xs text-[#2c2b2b]/55">

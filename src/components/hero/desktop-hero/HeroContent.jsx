@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function HeroContent() {
   return (
     <div
@@ -21,18 +23,17 @@ export default function HeroContent() {
       <div
         className="
           w-full
-          max-w-[470px]
-
+          max-w-[450px]
           text-left
 
           2xl:max-w-[520px]
         "
       >
-        {/* SMALL EYEBROW */}
+        {/* EYEBROW */}
 
         <div
           className="
-            mb-4
+            mb-5
             inline-flex
             items-center
             gap-2
@@ -42,7 +43,7 @@ export default function HeroContent() {
             border
             border-[#164fa5]/10
 
-            bg-white/70
+            bg-white/75
 
             px-3.5
             py-2
@@ -50,24 +51,46 @@ export default function HeroContent() {
             text-[10px]
             font-semibold
             uppercase
-            tracking-[0.12em]
+            tracking-[0.13em]
 
             text-[#164fa5]
 
             shadow-[0_6px_18px_rgba(22,79,165,0.06)]
 
-            backdrop-blur
+            backdrop-blur-md
           "
         >
           <span
             className="
+              relative
+              flex
               h-2
               w-2
-              rounded-full
-              bg-[#00b5e8]
-              shadow-[0_0_0_4px_rgba(0,181,232,0.10)]
             "
-          />
+          >
+            <span
+              className="
+                absolute
+                inline-flex
+                h-full
+                w-full
+                animate-ping
+                rounded-full
+                bg-[#00b5e8]/40
+              "
+            />
+
+            <span
+              className="
+                relative
+                inline-flex
+                h-2
+                w-2
+                rounded-full
+                bg-[#00b5e8]
+              "
+            />
+          </span>
 
           Kerala PSC Preparation
         </div>
@@ -76,15 +99,15 @@ export default function HeroContent() {
 
         <h1
           className="
-            text-[clamp(2.65rem,3.6vw,3.55rem)]
+            text-[clamp(2.65rem,3.5vw,3.45rem)]
 
             font-semibold
 
-            leading-[0.98]
+            leading-[1.01]
 
-            tracking-[-0.055em]
+            tracking-[-0.052em]
 
-            text-[#000]
+            text-black
 
             2xl:text-[clamp(3.3rem,3.6vw,4rem)]
           "
@@ -102,7 +125,10 @@ export default function HeroContent() {
               mt-1
               block
 
-            bg-gradient-to-r from-[#2563EB] via-[#4F46E5] to-[#7C3AED]
+              bg-gradient-to-r
+              from-[#164fa5]
+              via-[#017cc0]
+              to-[#00b5e8]
 
               bg-clip-text
 
@@ -131,7 +157,14 @@ export default function HeroContent() {
             "
           />
 
-          <span className="h-[4px] w-2 rounded-full bg-[#00b5e8]/30" />
+          <span
+            className="
+              h-[4px]
+              w-2
+              rounded-full
+              bg-[#00b5e8]/30
+            "
+          />
         </div>
 
         {/* DESCRIPTION */}
@@ -139,13 +172,14 @@ export default function HeroContent() {
         <p
           className="
             mt-6
-            max-w-[440px]
+            max-w-[430px]
 
             text-[14px]
             leading-7
 
-            text-[#2c2b2b]/[98]
+            text-[#2c2b2b]/95
 
+            2xl:max-w-[450px]
             2xl:text-[15px]
             2xl:leading-8
           "
@@ -162,11 +196,12 @@ export default function HeroContent() {
 
             grid
             w-full
-            max-w-[455px]
+            max-w-[450px]
             grid-cols-2
 
             gap-3
 
+            2xl:max-w-[470px]
             2xl:gap-4
           "
         >
@@ -204,8 +239,9 @@ export default function HeroContent() {
               duration-300
 
               hover:-translate-y-1
-
               hover:shadow-[0_18px_38px_rgba(22,79,165,0.32)]
+
+              active:translate-y-0
 
               2xl:text-sm
             "
@@ -217,7 +253,6 @@ export default function HeroContent() {
             <span
               className="
                 text-lg
-
                 transition-transform
                 duration-300
 
@@ -228,7 +263,7 @@ export default function HeroContent() {
             </span>
           </a>
 
-          {/* WATCH */}
+          {/* SECONDARY */}
 
           <a
             href="#intro"
@@ -246,9 +281,9 @@ export default function HeroContent() {
               rounded-full
 
               border
-              border-[#164fa5]/12
+              border-[#164fa5]/10
 
-              bg-white/95
+              bg-white/80
 
               px-4
 
@@ -256,19 +291,19 @@ export default function HeroContent() {
               font-semibold
               text-[#164fa5]
 
-              shadow-[0_10px_25px_rgba(22,79,165,0.09)]
+              shadow-[0_8px_22px_rgba(22,79,165,0.08)]
 
-              backdrop-blur-md
+              backdrop-blur-xl
 
               transition-all
               duration-300
 
               hover:-translate-y-1
-
-              hover:border-[#00b5e8]/30
+              hover:border-[#00b5e8]/25
               hover:bg-white
+              hover:shadow-[0_14px_30px_rgba(22,79,165,0.13)]
 
-              hover:shadow-[0_15px_32px_rgba(22,79,165,0.14)]
+              active:translate-y-0
 
               2xl:text-sm
             "
@@ -284,9 +319,7 @@ export default function HeroContent() {
 
                 rounded-full
 
-                bg-gradient-to-br
-                from-[#164fa5]
-                to-[#017cc0]
+                bg-[#164fa5]
 
                 pl-[2px]
 
@@ -295,10 +328,11 @@ export default function HeroContent() {
 
                 shadow-[0_6px_15px_rgba(22,79,165,0.20)]
 
-                transition-transform
+                transition-all
                 duration-300
 
                 group-hover:scale-105
+                group-hover:bg-[#017cc0]
               "
             >
               ▶
@@ -310,29 +344,89 @@ export default function HeroContent() {
           </a>
         </div>
 
-        {/* MINI TRUST ROW */}
+        {/* TRUST ROW */}
 
         <div
           className="
             mt-6
-
             flex
             items-center
             gap-3
-
-            text-[11px]
-            font-medium
-
-            text-[#2c2b2b]/50
           "
         >
-          <div className="flex items-center gap-1">
-            <span className="text-[#00b5e8]">●</span>
-            <span className="text-[#017cc0]">●</span>
-            <span className="text-[#164fa5]">●</span>
+          <div className="flex -space-x-1.5">
+          <span
+  className="
+    relative
+    h-6
+    w-6
+    overflow-hidden
+    rounded-full
+    border-2
+    border-white
+    bg-[#00b5e8]
+  "
+>
+  <Image
+    src="/assets/psc-candidate1.png"
+    alt="PSC student"
+    fill
+    sizes="24px"
+    className="object-cover"
+  />
+</span>
+
+<span
+  className="
+    relative
+    h-6
+    w-6
+    overflow-hidden
+    rounded-full
+    border-2
+    border-white
+    bg-[#00b5e8]
+  "
+>
+  <Image
+    src="/assets/psc-candidate2.png"
+    alt="PSC student"
+    fill
+    sizes="24px"
+    className="object-cover"
+  />
+</span>
+<span
+  className="
+    relative
+    h-6
+    w-6
+    overflow-hidden
+    rounded-full
+    border-2
+    border-white
+    bg-[#00b5e8]
+  "
+>
+  <Image
+    src="/assets/psc-candidate3.png"
+    alt="PSC student"
+    fill
+    sizes="24px"
+    className="object-cover"
+  />
+</span>
           </div>
 
-          Trusted by thousands of aspirants
+          <span
+            className="
+              text-[11px]
+              font-medium
+              text-black/60
+            "
+          >
+            Trusted by thousands of aspirants
+          </span>
         </div>
       </div>
     </div>

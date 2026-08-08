@@ -44,8 +44,8 @@ const FeatureGrid = ({ cards }) => {
       className="
         grid
         grid-cols-1
-        gap-x-8
-        gap-y-8
+        gap-x-5
+        gap-y-5
         sm:grid-cols-2
         md:grid-cols-3
         lg:grid-cols-3
