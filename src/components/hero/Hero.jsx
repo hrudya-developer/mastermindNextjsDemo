@@ -10,7 +10,7 @@ export default function Hero() {
       </div>
 
       {/* Desktop 3-column hero */}
-      <div className="hidden xl:block">
+      <div className="hidden xl:block" id="hero">
         <DesktopHero />
       </div>
     </>

@@ -4,7 +4,7 @@ import HeroStats from "./HeroStats";
 
 export default function HeroCenter() {
   return (
-    <main className="min-w-0 bg-white p-3 2xl:p-4">
+    <main className="">
       <div
         className="
           relative

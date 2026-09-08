@@ -1,122 +1,856 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
+
+import {
+  ArrowRight,
+  Quote,
+  Star,
+} from "lucide-react";
 
 const testimonials = [
   {
     id: 1,
     img: "/assets/avatar1.png",
-    text: "The classes are very helpful and the teachers explain everything clearly.",
+    text:
+      "The classes are very helpful and the teachers explain everything clearly.",
     name: "Student Name",
   },
   {
     id: 2,
     img: "/assets/avatar1.png",
-    text: "The classes are very helpful and the teachers explain everything clearly.",
+    text:
+      "The classes are very helpful and the teachers explain everything clearly.",
     name: "Student Name",
   },
   {
     id: 3,
     img: "/assets/avatar1.png",
-    text: "The classes are very helpful and the teachers explain everything clearly.",
+    text:
+      "The classes are very helpful and the teachers explain everything clearly.",
     name: "Student Name",
   },
 ];
 
-const Testimonials = () => {
+export default function Testimonials() {
   return (
-    <section className="relative overflow-hidden py-20 md:py-28" data-aos="fade-up">
-      <div className="absolute inset-0 bg-linear-to-b from-white via-indigo-50/40 to-blue-50/60" />
-
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-blue-200/30 blur-3xl" />
-        <div className="absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-violet-200/30 blur-3xl" />
-        <div className="absolute left-1/2 top-1/3 h-72 w-72 -translate-x-1/2 rounded-full bg-cyan-100/30 blur-3xl" />
-      </div>
+    <section
+      className="
+        relative
+        overflow-hidden
+        bg-[#f7fbff]
+        py-16
+        sm:py-20
+        lg:py-24
+      "
+      data-aos="fade-up"
+    >
+      {/* =====================================================
+          BACKGROUND DECORATION
+      ===================================================== */}
 
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.045]"
-        style={{
-          backgroundImage:
-            "radial-linear(circle, rgb(79 70 229) 1px, transparent 1px)",
-          backgroundSize: "26px 26px",
-        }}
-      />
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          overflow-hidden
+        "
+      >
+        {/* Light blue glow */}
 
-      <div className="relative z-10 mx-auto max-w-7xl px-5 sm:px-6 lg:px-8">
-        <div className="mx-auto mb-14 max-w-3xl text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/80 px-4 py-2 shadow-sm backdrop-blur">
-            <span className="h-2 w-2 rounded-full bg-indigo-600" />
+        <div
+          className="
+            absolute
+            -left-40
+            top-4
+            h-[420px]
+            w-[420px]
+            rounded-full
+            bg-[#00b5e8]/12
+            blur-[120px]
+          "
+        />
 
-            <span className="text-sm font-semibold text-indigo-700">
+        {/* Pink glow */}
+
+        <div
+          className="
+            absolute
+            -right-36
+            bottom-0
+            h-[420px]
+            w-[420px]
+            rounded-full
+            bg-pink-400/12
+            blur-[120px]
+          "
+        />
+
+        {/* Medium blue glow */}
+
+        <div
+          className="
+            absolute
+            left-[50%]
+            top-[28%]
+            h-[280px]
+            w-[280px]
+            -translate-x-1/2
+            rounded-full
+            bg-[#017cc0]/7
+            blur-[100px]
+          "
+        />
+
+        {/* Light grid */}
+
+        <div
+          className="
+            absolute
+            inset-0
+            opacity-[0.16]
+            [background-image:linear-gradient(rgba(22,79,165,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(0,181,232,0.055)_1px,transparent_1px)]
+            [background-size:28px_28px]
+          "
+        />
+
+        {/* Dot pattern */}
+
+        <div
+          className="
+            absolute
+            right-[8%]
+            top-14
+            h-[105px]
+            w-[105px]
+            opacity-[0.20]
+            [background-image:radial-gradient(circle,#00b5e8_1.1px,transparent_1.1px)]
+            [background-size:14px_14px]
+          "
+        />
+
+        <div
+          className="
+            absolute
+            bottom-12
+            left-[6%]
+            h-[100px]
+            w-[100px]
+            opacity-[0.14]
+            [background-image:radial-gradient(circle,#ec4899_1.1px,transparent_1.1px)]
+            [background-size:14px_14px]
+          "
+        />
+      </div>
+
+      {/* =====================================================
+          CONTAINER
+      ===================================================== */}
+
+      <div
+        className="
+          relative
+          z-10
+          mx-auto
+          w-full
+          max-w-7xl
+          px-4
+          sm:px-6
+          lg:px-8
+        "
+      >
+        {/* =================================================
+            HEADING
+        ================================================= */}
+
+        <div
+          className="
+            mx-auto
+            mb-12
+            max-w-3xl
+            text-center
+            lg:mb-14
+          "
+        >
+          <div
+            className="
+              inline-flex
+              items-center
+              gap-2
+              rounded-full
+              border
+              border-[#164fa5]/10
+              bg-white/90
+              px-4
+              py-2
+              shadow-[0_6px_20px_rgba(15,23,42,0.05)]
+              backdrop-blur
+            "
+          >
+            <span
+              className="
+                h-2
+                w-2
+                rounded-full
+                bg-pink-500
+              "
+            />
+
+            <span
+              className="
+                text-[11px]
+                font-black
+                uppercase
+                tracking-[0.18em]
+                text-[#164fa5]
+              "
+            >
               Student Stories
             </span>
           </div>
 
-          <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl md:text-5xl">
+          <h2
+            className="
+              mt-5
+              text-3xl
+              font-black
+              tracking-[-0.035em]
+              text-[#0b216c]
+              sm:text-4xl
+              md:text-5xl
+            "
+          >
             What Our{" "}
-            <span className="bg-linear-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
+            <span className="text-[#164fa5]">
               Students Say
             </span>
           </h2>
 
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-            Hear from students who are learning, growing, and preparing with
-            confidence through our classes.
+          <p
+            className="
+              mx-auto
+              mt-5
+              max-w-2xl
+              text-sm
+              leading-7
+              text-slate-600
+              sm:text-base
+            "
+          >
+            Hear from students who are
+            learning, growing and preparing
+            with confidence through our
+            classes.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((item) => (
+        {/* =================================================
+            TESTIMONIAL GRID
+        ================================================= */}
+
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-5
+            lg:grid-cols-[1.08fr_0.92fr]
+          "
+        >
+          {/* =================================================
+              LARGE FEATURED CARD
+          ================================================= */}
+
+          <article
+            className="
+              group
+              relative
+              min-h-[430px]
+              overflow-hidden
+              rounded-[30px]
+              border
+              border-white/20
+              bg-[#164fa5]
+              p-7
+              text-white
+              shadow-[0_24px_70px_rgba(22,79,165,0.20)]
+              transition-all
+              duration-300
+              hover:-translate-y-1
+              hover:shadow-[0_28px_75px_rgba(22,79,165,0.26)]
+              sm:p-9
+            "
+          >
+            {/* Color glows */}
+
             <div
-              key={item.id}
-              className="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white/80 p-7 shadow-[0_10px_35px_rgba(15,23,42,0.06)] backdrop-blur-md transition-all duration-300 hover:-translate-y-2 hover:border-indigo-200 hover:shadow-[0_20px_50px_rgba(79,70,229,0.12)]"
+              aria-hidden="true"
+              className="
+                absolute
+                -right-24
+                -top-24
+                h-72
+                w-72
+                rounded-full
+                bg-[#00b5e8]/30
+                blur-3xl
+              "
+            />
+
+            <div
+              aria-hidden="true"
+              className="
+                absolute
+                -bottom-28
+                -left-28
+                h-72
+                w-72
+                rounded-full
+                bg-pink-400/20
+                blur-3xl
+              "
+            />
+
+            {/* Dot pattern */}
+
+            <div
+              aria-hidden="true"
+              className="
+                absolute
+                inset-0
+                opacity-[0.08]
+                [background-image:radial-gradient(circle,#ffffff_1px,transparent_1px)]
+                [background-size:22px_22px]
+              "
+            />
+
+            <div
+              className="
+                relative
+                z-10
+                flex
+                h-full
+                flex-col
+                justify-between
+              "
             >
-              <span className="absolute right-6 top-3 font-serif text-7xl leading-none text-indigo-100 transition-colors group-hover:text-indigo-200">
-                “
-              </span>
+              <div>
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
+                  <span
+                    className="
+                      flex
+                      h-12
+                      w-12
+                      items-center
+                      justify-center
+                      rounded-2xl
+                      bg-white/15
+                      text-white
+                      backdrop-blur
+                    "
+                  >
+                    <Quote
+                      className="h-5 w-5"
+                      aria-hidden="true"
+                    />
+                  </span>
 
-              <div className="relative z-10 mb-5">
-                <div className="mx-auto w-fit rounded-full bg-linear-to-br from-blue-500 via-indigo-500 to-violet-500 p-[3px]">
-                  <Image
-                    src={item.img}
-                    alt={item.name}
-                    width={64}
-                    height={64}
-                    className="h-16 w-16 rounded-full border-2 border-white object-cover"
-                  />
+                  <Rating />
                 </div>
-              </div>
 
-              <div className="mb-4 flex justify-center gap-1 text-amber-400">
-                <span>★</span>
-                <span>★</span>
-                <span>★</span>
-                <span>★</span>
-                <span>★</span>
-              </div>
-
-              <p className="relative z-10 text-center text-sm leading-7 text-slate-600 sm:text-base">
-                “{item.text}”
-              </p>
-
-              <div className="mx-auto my-6 h-px w-16 bg-linear-to-r from-transparent via-indigo-300 to-transparent" />
-
-              <div className="text-center">
-                <h3 className="font-semibold text-slate-900">{item.name}</h3>
-
-                <p className="mt-1 text-xs font-medium uppercase tracking-wider text-indigo-600">
-                  Student
+                <p
+                  className="
+                    mt-8
+                    max-w-xl
+                    text-xl
+                    font-medium
+                    leading-9
+                    text-white/95
+                    sm:text-2xl
+                  "
+                >
+                  “{testimonials[0].text}”
                 </p>
               </div>
 
-              <div className="absolute bottom-0 left-0 h-1 w-0 bg-linear-to-r from-blue-500 via-indigo-500 to-violet-500 transition-all duration-500 group-hover:w-full" />
+              <StudentProfile
+                item={testimonials[0]}
+                light
+                large
+              />
             </div>
-          ))}
+          </article>
+
+          {/* =================================================
+              RIGHT SIDE
+          ================================================= */}
+
+          <div
+            className="
+              grid
+              gap-5
+            "
+          >
+            {/* TOP BLUE CARD */}
+
+            <article
+              className="
+                group
+                relative
+                overflow-hidden
+                rounded-[26px]
+                border
+                border-[#00b5e8]/20
+                bg-[#eaf9ff]
+                p-6
+                shadow-[0_16px_45px_rgba(15,23,42,0.06)]
+                transition-all
+                duration-300
+                hover:-translate-y-1
+                hover:shadow-[0_20px_50px_rgba(1,124,192,0.12)]
+              "
+            >
+              <div
+                aria-hidden="true"
+                className="
+                  absolute
+                  -right-16
+                  -top-16
+                  h-40
+                  w-40
+                  rounded-full
+                  bg-[#00b5e8]/18
+                  blur-3xl
+                "
+              />
+
+              <div
+                aria-hidden="true"
+                className="
+                  absolute
+                  -bottom-16
+                  -left-16
+                  h-32
+                  w-32
+                  rounded-full
+                  bg-[#164fa5]/8
+                  blur-3xl
+                "
+              />
+
+              <div className="relative z-10">
+                <div
+                  className="
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
+                  <span
+                    className="
+                      flex
+                      h-10
+                      w-10
+                      items-center
+                      justify-center
+                      rounded-xl
+                      bg-[#017cc0]
+                      text-white
+                      shadow-sm
+                    "
+                  >
+                    <Quote
+                      className="h-4 w-4"
+                      aria-hidden="true"
+                    />
+                  </span>
+
+                  <Rating />
+                </div>
+
+                <p
+                  className="
+                    mt-5
+                    text-base
+                    leading-7
+                    text-slate-700
+                  "
+                >
+                  “{testimonials[1].text}”
+                </p>
+
+                <StudentProfile
+                  item={testimonials[1]}
+                />
+              </div>
+            </article>
+
+            {/* BOTTOM CARDS */}
+
+            <div
+              className="
+                grid
+                grid-cols-1
+                gap-5
+                sm:grid-cols-2
+              "
+            >
+              <SmallCard
+                item={testimonials[2]}
+                variant="pink"
+              />
+
+              <SmallCard
+                item={testimonials[0]}
+                variant="cyan"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* =================================================
+            VIEW ALL BUTTON
+        ================================================= */}
+
+        <div
+          className="
+            mt-10
+            flex
+            justify-center
+          "
+        >
+          <Link
+            href="/testimonials/"
+            className="
+              group
+              inline-flex
+              items-center
+              justify-center
+              gap-2.5
+              rounded-full
+              bg-mediumBlue
+              px-7
+              py-3.5
+              text-sm
+              font-extrabold
+              text-white
+              shadow-[0_12px_30px_rgba(22,79,165,0.22)]
+              transition-all
+              duration-300
+              hover:-translate-y-0.5
+              hover:bg-[#0b216c]
+              hover:shadow-[0_18px_38px_rgba(22,79,165,0.28)]
+            "
+          >
+            View All Testimonials
+
+            <ArrowRight
+              className="
+                h-4
+                w-4
+                transition-transform
+                duration-300
+                group-hover:translate-x-1
+              "
+              aria-hidden="true"
+            />
+          </Link>
         </div>
       </div>
     </section>
   );
-};
+}
 
-export default Testimonials;
+/* =========================================================
+   SMALL CARD
+========================================================= */
+
+function SmallCard({
+  item,
+  variant = "cyan",
+}) {
+  const variants = {
+    cyan: {
+      card:
+        "border-[#00b5e8]/25 bg-[#e6f8ff]",
+
+      glow:
+        "bg-[#00b5e8]/20",
+
+      icon:
+        "bg-[#017cc0] text-white",
+
+      text:
+        "text-slate-700",
+    },
+
+    pink: {
+      card:
+        "border-pink-300/70 bg-[#ffe1ec]",
+
+      glow:
+        "bg-pink-400/25",
+
+      icon:
+        "bg-pink-500 text-white",
+
+      text:
+        "text-[#6c2a44]",
+    },
+  };
+
+  const style =
+    variants[variant];
+
+  return (
+    <article
+      className={`
+        group
+        relative
+        flex
+        min-h-[245px]
+        flex-col
+        justify-between
+        overflow-hidden
+        rounded-[24px]
+        border
+        p-5
+        shadow-[0_12px_35px_rgba(15,23,42,0.05)]
+        transition-all
+        duration-300
+
+        hover:-translate-y-1
+        hover:shadow-[0_18px_45px_rgba(15,23,42,0.09)]
+
+        ${style.card}
+      `}
+    >
+      {/* Glow */}
+
+      <div
+        aria-hidden="true"
+        className={`
+          pointer-events-none
+          absolute
+          -right-14
+          -top-14
+          h-32
+          w-32
+          rounded-full
+          blur-3xl
+
+          ${style.glow}
+        `}
+      />
+
+      {/* Dot texture */}
+
+      <div
+        aria-hidden="true"
+        className="
+          pointer-events-none
+          absolute
+          inset-0
+          opacity-[0.10]
+          [background-image:radial-gradient(circle,#164fa5_1px,transparent_1px)]
+          [background-size:18px_18px]
+        "
+      />
+
+      <div
+        className="
+          relative
+          z-10
+        "
+      >
+        <span
+          className={`
+            flex
+            h-9
+            w-9
+            items-center
+            justify-center
+            rounded-xl
+            shadow-sm
+
+            ${style.icon}
+          `}
+        >
+          <Quote
+            className="h-4 w-4"
+            aria-hidden="true"
+          />
+        </span>
+
+        <p
+          className={`
+            mt-5
+            text-sm
+            leading-6
+
+            ${style.text}
+          `}
+        >
+          “{item.text}”
+        </p>
+      </div>
+
+      <div className="relative z-10">
+        <StudentProfile
+          item={item}
+          small
+        />
+      </div>
+    </article>
+  );
+}
+
+/* =========================================================
+   STUDENT PROFILE
+========================================================= */
+
+function StudentProfile({
+  item,
+  light = false,
+  large = false,
+  small = false,
+}) {
+  return (
+    <div
+      className={`
+        flex
+        items-center
+        gap-3
+
+        ${
+          large
+            ? "mt-10"
+            : "mt-6"
+        }
+      `}
+    >
+      <div
+        className={`
+          relative
+          shrink-0
+          overflow-hidden
+          rounded-full
+          border-[3px]
+          shadow-sm
+
+          ${
+            light
+              ? "border-white/40"
+              : "border-white"
+          }
+
+          ${
+            small
+              ? "h-10 w-10"
+              : large
+              ? "h-14 w-14"
+              : "h-12 w-12"
+          }
+        `}
+      >
+        <Image
+          src={item.img}
+          alt={item.name}
+          fill
+          sizes={
+            small
+              ? "40px"
+              : large
+              ? "56px"
+              : "48px"
+          }
+          className="
+            object-cover
+            object-center
+          "
+        />
+      </div>
+
+      <div className="min-w-0">
+        <p
+          className={`
+            truncate
+            font-black
+
+            ${
+              light
+                ? "text-white"
+                : "text-[#0b216c]"
+            }
+
+            ${
+              large
+                ? "text-base"
+                : "text-sm"
+            }
+          `}
+        >
+          {item.name}
+        </p>
+
+        <p
+          className={`
+            mt-0.5
+            text-xs
+            font-medium
+
+            ${
+              light
+                ? "text-white/70"
+                : "text-slate-500"
+            }
+          `}
+        >
+          Student
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
+   RATING
+========================================================= */
+
+function Rating() {
+  return (
+    <div
+      className="
+        flex
+        items-center
+        gap-1
+      "
+      aria-label="5 out of 5 stars"
+    >
+      {Array.from({
+        length: 5,
+      }).map(
+        (_, index) => (
+          <Star
+            key={index}
+            className="
+              h-3.5
+              w-3.5
+              fill-amber-400
+              text-amber-400
+            "
+            aria-hidden="true"
+          />
+        )
+      )}
+    </div>
+  );
+}

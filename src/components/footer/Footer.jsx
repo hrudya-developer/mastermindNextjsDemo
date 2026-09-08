@@ -4,7 +4,7 @@ import Link from "next/link";
 const Footer = () => {
   return (
     <footer
-      className="relative overflow-hidden bg-cover bg-center bg-no-repeat"
+      className="relative overflow-hidden bg-cover bg-center bg-no-repeat" data-aos="fade-up"
       style={{
         backgroundImage: "url('/assets/mastermind-footer-bg.webp')",
       }}

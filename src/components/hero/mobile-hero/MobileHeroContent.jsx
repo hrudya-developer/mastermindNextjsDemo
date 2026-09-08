@@ -16,7 +16,7 @@ export default function MobileHeroContent() {
         pt-10
         sm:px-6
         sm:pb-16
-        sm:pt-12
+        sm:pt-12 mt-24
       "
     >
       <div className="w-full text-center">

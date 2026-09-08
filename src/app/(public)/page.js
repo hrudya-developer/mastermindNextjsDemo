@@ -1,8 +1,7 @@
-// app/page.js
-
 import EnquiryForm from "@/components/enquiry-form/EnquiryForm";
-
+import HomeFAQ from "@/components/faq/HomeFAQ";
 import Hero from "@/components/hero/Hero";
+import IntroSection from "@/components/intro-section/IntroSection";
 import MobileAppWrapper from "@/components/mobile-app/MobileAppWrapper";
 import PopularCourses from "@/components/popular-courses-section/PopularCourses";
 import Testimonials from "@/components/testimonials/Testimonials";
@@ -33,12 +32,14 @@ export const metadata = {
   },
 
   openGraph: {
-    title: "MasterMind Academy | Kerala PSC, SSC & RRB Coaching",
+    title:
+      "MasterMind Academy | Kerala PSC, SSC & RRB Coaching",
 
     description:
       "Prepare for competitive exams with structured courses, mock tests, previous questions, current affairs and expert guidance.",
 
     url: "/",
+
     siteName: "MasterMind Academy",
 
     images: [
@@ -56,7 +57,9 @@ export const metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "MasterMind Academy | Competitive Exam Coaching",
+
+    title:
+      "MasterMind Academy | Competitive Exam Coaching",
 
     description:
       "Kerala PSC, SSC and RRB preparation with mock tests, PYQs, current affairs and study materials.",
@@ -78,16 +81,18 @@ export const metadata = {
   },
 };
 
-export default function Home() {
+export default function HomePage() {
   const jsonLd = {
     "@context": "https://schema.org",
+
     "@type": "EducationalOrganization",
 
     name: "MasterMind Academy",
 
     url: "https://mastermindacademy.in",
 
-    logo: "https://mastermindacademy.in/images/logo-128.png",
+    logo:
+      "https://mastermindacademy.in/images/logo-128.png",
 
     description:
       "MasterMind Academy provides coaching and learning resources for Kerala PSC, SSC, RRB and other competitive examinations.",
@@ -112,15 +117,20 @@ export default function Home() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(jsonLd).replace(
+            /</g,
+            "\\u003c"
+          ),
         }}
       />
 
-      {/* Navbar is fixed, so offset the page once here */}
-      <main className="">
+      <main>
         <Hero />
 
         <Topbar />
+
+        <IntroSection />
+
         <PopularCourses />
 
         <WhyChooseUs />
@@ -130,8 +140,7 @@ export default function Home() {
         <Testimonials />
 
         <EnquiryForm />
-
-        
+        <HomeFAQ />
       </main>
     </>
   );

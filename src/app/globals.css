@@ -10,6 +10,7 @@
   --color-darkBlue: #164fa5;
   --color-lightBlue: #00b5e8;
   --color-mediumBlue: #017cc0;
+  --color-violetBlue:#0b216c;
 }
 
 :root {
@@ -25,6 +26,7 @@
   --darkBlue: #164fa5;
   --lightBlue: #00b5e8;
   --mediumBlue: #017cc0;
+  --color-violetBlue:#0b216c;
 }
 
 html {

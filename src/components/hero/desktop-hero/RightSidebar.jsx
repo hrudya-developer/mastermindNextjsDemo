@@ -10,7 +10,7 @@ export default function RightSidebar() {
         from-[#f9fcff]
         via-[#f4faff]
         to-[#eef7fc]
-        p-5
+        p-5 rounded-2xl
 
         xl:flex
         xl:flex-col
@@ -110,11 +110,11 @@ export default function RightSidebar() {
       >
         <div>
           <strong className="block text-sm">
-            View All Courses
+            Download Study Materials
           </strong>
 
           <span className="mt-2 block text-[11px] text-white/75">
-            Browse all available courses
+          Access helpful study resources
           </span>
         </div>
 

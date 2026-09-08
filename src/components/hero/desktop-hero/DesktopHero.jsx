@@ -1,29 +1,50 @@
-import LeftSidebar from "./LeftSidebar";
 import HeroCenter from "./HeroCenter";
 import RightSidebar from "./RightSidebar";
 
 export default function DesktopHero() {
   return (
-    <section className="w-full bg-[#f4f7ff] px-4 py-5 2xl:px-6">
+    <section
+      id="hero"
+      className="
+        relative
+        w-full
+        overflow-hidden
+        bg-[#f4f9ff]
+
+        pt-[68px]
+        sm:pt-[74px]
+        lg:pt-[104px]
+      "
+    >
       <div
         className="
           mx-auto
           grid
           w-full
-          max-w-[1700px]
-          grid-cols-[150px_minmax(0,1fr)_300px]
-          overflow-hidden
-          rounded-[30px]
-          bg-white
-          shadow-[0_20px_60px_rgba(30,64,175,0.08)]
-          2xl:grid-cols-[165px_minmax(0,1fr)_320px]
+          max-w-[1600px]
+          grid-cols-1
+          gap-4
+          px-3
+          pb-4
+
+          sm:px-4
+
+          lg:grid-cols-[minmax(0,1fr)_310px]
+          lg:gap-4
+          lg:px-6
+          lg:pb-6
+
+          xl:grid-cols-[minmax(0,1fr)_340px]
+          xl:px-8
         "
       >
-        <LeftSidebar />
-
+        {/* MAIN HERO */}
         <HeroCenter />
 
-        <RightSidebar />
+        {/* RIGHT LEARNING HUB */}
+        <div className="hidden lg:block">
+          <RightSidebar />
+        </div>
       </div>
     </section>
   );
