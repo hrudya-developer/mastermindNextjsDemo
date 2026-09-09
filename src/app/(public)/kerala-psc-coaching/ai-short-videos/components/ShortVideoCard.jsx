@@ -1,129 +1,211 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
 
 import {
   Play,
+  Sparkles,
 } from "lucide-react";
 
 export default function ShortVideoCard({
-  item,
+  video,
 }) {
+  const handlePlay = () => {
+    if (!video?.videoUrl) {
+      return;
+    }
+
+    window.open(
+      video.videoUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
   return (
-    <Link
-      href={item.href}
-      data-aos="fade-up"
+    <article
       className="
         group
         relative
-        block
-        aspect-[4/5]
-        min-w-[150px]
         overflow-hidden
-        rounded-[14px]
+        rounded-[20px]
         border
-        border-white/80
-        bg-slate-200
-        shadow-[0_8px_22px_rgba(15,58,110,0.08)]
-        transition-all
+        border-[#164fa5]/10
+        bg-white
+        shadow-[0_10px_28px_rgba(11,33,108,0.07)]
+        transition
         duration-300
 
         hover:-translate-y-1
-        hover:shadow-[0_16px_32px_rgba(15,58,110,0.14)]
-
-        sm:min-w-0
+        hover:shadow-[0_18px_40px_rgba(11,33,108,0.12)]
       "
     >
-      <Image
-        src={item.image}
-        alt={item.title}
-        fill
-        sizes="
-          (max-width: 640px) 160px,
-          (max-width: 1024px) 25vw,
-          180px
-        "
+      <button
+        type="button"
+        onClick={handlePlay}
         className="
-          object-cover
-          transition-transform
-          duration-500
-          group-hover:scale-105
-        "
-      />
-
-      <div
-        aria-hidden="true"
-        className="
-          absolute
-          inset-0
-          bg-gradient-to-t
-          from-[#061a3a]/80
-          via-transparent
-          to-transparent
-        "
-      />
-
-      <div
-        className="
-          absolute
-          right-2
-          top-1/2
-          z-10
-          flex
-          h-8
-          w-8
-          -translate-y-1/2
-          items-center
-          justify-center
-          rounded-full
-          bg-white/90
-          text-[#0b216c]
-          shadow-[0_6px_16px_rgba(0,0,0,0.16)]
-          transition-all
-          duration-300
-
-          group-hover:scale-110
+          relative
+          block
+          aspect-[9/16]
+          w-full
+          overflow-hidden
+          bg-[#0b216c]
+          text-left text-lighBlue
         "
       >
-        <Play
-          className="ml-0.5 h-3.5 w-3.5"
-          fill="currentColor"
+        {video?.thumbnail ? (
+          <Image
+            src={video.thumbnail}
+            alt={
+              video?.title ||
+              "Mastermind AI short video"
+            }
+            fill
+            sizes="
+              (max-width: 640px) 50vw,
+              (max-width: 1024px) 33vw,
+              (max-width: 1280px) 25vw,
+              20vw
+            "
+            className="
+              object-cover
+              transition
+              duration-500
+
+              group-hover:scale-[1.04]
+            "
+          />
+        ) : (
+          <div
+            className="
+              absolute
+              inset-0
+              bg-gradient-to-br
+              from-[#164fa5]
+              via-[#017cc0]
+              to-[#00b5e8]
+            "
+          />
+        )}
+
+        <div
+          className="
+            absolute
+            inset-0
+            bg-gradient-to-t
+            from-[#07174f]/95
+            via-[#07174f]/20
+            to-transparent
+          "
         />
-      </div>
 
-      <div
-        className="
-          absolute
-          inset-x-0
-          bottom-0
-          z-10
-          p-3
-        "
-      >
-        <h3
+        {/* TOP BADGE */}
+        <div
           className="
-            line-clamp-2
-            text-[12px]
-            font-black
-            leading-[1.2]
-            text-white
-
-            sm:text-[13px]
-          "
-        >
-          {item.title}
-        </h3>
-
-        <p
-          className="
-            mt-1
-            line-clamp-1
+            absolute
+            left-3
+            top-3
+            z-10
+            inline-flex
+            items-center
+            gap-1.5
+            rounded-full
+            border
+            border-white/15
+            bg-black/20
+            px-2.5
+            py-1.5
             text-[9px]
-            text-white/70
+            font-bold
+            uppercase
+            tracking-[0.14em]
+            text-white
+            backdrop-blur-md
           "
         >
-          {item.subtitle}
-        </p>
-      </div>
-    </Link>
+          <Sparkles
+            size={11}
+            className="text-[#00b5e8]"
+          />
+
+          AI Short
+        </div>
+
+        {/* PLAY */}
+        <div
+          className="
+            absolute
+            left-1/2
+            top-1/2
+            z-10
+            flex
+            h-14
+            w-14
+            -translate-x-1/2
+            -translate-y-1/2
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-white/25
+            bg-black/40
+            text-white
+            shadow-[0_10px_30px_rgba(0,0,0,0.18)]
+            backdrop-blur-md
+            transition
+            duration-300
+
+            group-hover:scale-110
+            group-hover:bg-white/30
+          "
+        >
+          <Play
+            size={28}
+            fill="white" stroke="0"
+            className="ml-0.5"
+          />
+        </div>
+
+        {/* CONTENT */}
+        <div
+          className="
+            absolute
+            inset-x-0
+            bottom-0
+            z-10
+            p-3.5
+          "
+        >
+          <h3
+            className="
+              line-clamp-2
+              text-[13px]
+              font-black
+              leading-[1.35]
+              text-white
+
+              sm:text-[14px]
+            "
+          >
+            {video?.title ||
+              "AI Learning Video"}
+          </h3>
+
+          {video?.description && (
+            <p
+              className="
+                mt-1
+                line-clamp-2
+                text-[10px]
+                leading-4
+                text-white/65
+              "
+            >
+              {video.description}
+            </p>
+          )}
+        </div>
+      </button>
+    </article>
   );
 }

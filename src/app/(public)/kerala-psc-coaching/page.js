@@ -15,11 +15,12 @@ import {
 import {
   createSlug,
 } from "@/lib/pscSlug";
-import RecommendedCoursesSection from "./recommeded-courses/components/RecommendedCoursesSection";
+
 import LatestUpdatesSection from "./latest-updates/components/LatestUpdatesSection";
 import KPSCFAQ from "./faq/KPSCFAQ";
 import CompetitiveExamPacks from "./competitive-exam-packs/CompetitiveExamPacks";
 import AIShortVideos from "./ai-short-videos/components/AIShortVideos";
+import SubExamSection from "./recommeded-courses/[recommendedCoursesSlug.js]/components/SubExamSection";
 
 /*
  * This identifies which API course belongs
@@ -120,7 +121,7 @@ export default async function KeralaPscPage() {
           <ExamCategorySection
             course={course}
           />
-          <RecommendedCoursesSection />
+         <SubExamSection />
           <AIShortVideos />
           <CompetitiveExamPacks />
           <LatestUpdatesSection />

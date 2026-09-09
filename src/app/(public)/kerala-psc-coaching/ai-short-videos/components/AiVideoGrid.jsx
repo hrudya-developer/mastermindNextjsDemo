@@ -1,6 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import {
   ChevronLeft,
   ChevronRight,
@@ -89,7 +94,9 @@ export default function AiVideoGrid() {
           );
         }
 
-        if (!active) return;
+        if (!active) {
+          return;
+        }
 
         setVideos(
           Array.isArray(result?.videos)
@@ -148,8 +155,11 @@ export default function AiVideoGrid() {
     );
   };
 
-  const cardWidth =
-    100 / itemsPerView;
+  /* =====================================================
+     TRACK POSITION
+  ====================================================== */
+
+  const cardWidth = 100 / itemsPerView;
 
   const translatePercentage =
     currentIndex * cardWidth;
@@ -165,6 +175,7 @@ export default function AiVideoGrid() {
           grid
           grid-cols-1
           gap-4
+
           sm:grid-cols-2
           md:grid-cols-3
           lg:grid-cols-4
@@ -235,16 +246,14 @@ export default function AiVideoGrid() {
     );
   }
 
-  /* =====================================================
-     CAROUSEL
-  ====================================================== */
-
   return (
     <div className="relative">
-      {/* CONTROLS */}
+      {/* =================================================
+          TOP CONTROLS
+      ================================================== */}
       <div
         className="
-          mb-5
+          mb-4
           flex
           items-center
           justify-between
@@ -254,16 +263,16 @@ export default function AiVideoGrid() {
         <p
           className="
             text-xs
-            font-medium
+            font-semibold
             text-slate-500
           "
         >
           Showing{" "}
-          <span className="font-bold text-[#164fa5]">
+          <span className="font-black text-[#164fa5]">
             {currentIndex + 1}
           </span>
           {" - "}
-          <span className="font-bold text-[#164fa5]">
+          <span className="font-black text-[#164fa5]">
             {Math.min(
               currentIndex +
                 itemsPerView,
@@ -358,13 +367,16 @@ export default function AiVideoGrid() {
         </div>
       </div>
 
-      {/* CAROUSEL */}
+      {/* =================================================
+          CAROUSEL VIEWPORT
+      ================================================== */}
       <div
         className="
           overflow-hidden
           rounded-[22px]
         "
       >
+        {/* TRACK */}
         <div
           className="
             flex
@@ -396,7 +408,9 @@ export default function AiVideoGrid() {
         </div>
       </div>
 
-      {/* PAGINATION */}
+      {/* =================================================
+          PAGINATION
+      ================================================== */}
       {videos.length > itemsPerView && (
         <div
           className="
@@ -417,25 +431,41 @@ export default function AiVideoGrid() {
               <button
                 key={index}
                 type="button"
+                aria-label={`Show videos starting from ${
+                  index + 1
+                }`}
                 onClick={() =>
                   setCurrentIndex(index)
                 }
-                aria-label={`Go to slide ${
-                  index + 1
-                }`}
                 className={`
+                  relative
                   h-2
+                  overflow-hidden
                   rounded-full
                   transition-all
                   duration-300
 
                   ${
                     active
-                      ? "w-7 bg-gradient-to-r from-[#164fa5] to-[#00b5e8]"
+                      ? "w-8 bg-[#164fa5]/10"
                       : "w-2 bg-[#164fa5]/15 hover:bg-[#164fa5]/30"
                   }
                 `}
-              />
+              >
+                {active && (
+                  <span
+                    className="
+                      absolute
+                      inset-0
+                      rounded-full
+                      bg-gradient-to-r
+                      from-[#164fa5]
+                      via-[#017cc0]
+                      to-[#00b5e8]
+                    "
+                  />
+                )}
+              </button>
             );
           })}
         </div>

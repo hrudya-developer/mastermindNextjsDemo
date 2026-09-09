@@ -85,9 +85,8 @@ export default function RightSidebar() {
         href="#courses"
         className="
           group
-          mt-auto
           flex
-          min-h-[100px]
+          min-h-[90px] mt-3
           items-center
           justify-between
 
