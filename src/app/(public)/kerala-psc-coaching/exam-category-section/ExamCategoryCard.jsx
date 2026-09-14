@@ -13,7 +13,10 @@ function buildImageUrl(
   filePath,
   image
 ) {
-  if (!filePath || !image) {
+  if (
+    !filePath ||
+    !image
+  ) {
     return "";
   }
 
@@ -35,15 +38,31 @@ function buildImageUrl(
 export default function ExamCategoryCard({
   item,
   filePath,
+  courseId,
 }) {
   const title =
-    item?.name || "Exam";
+    item?.name ||
+    "Exam";
 
   const slug =
     createSlug(title);
 
+  /*
+   * Example:
+   *
+   * courseId = 1
+   * item.id   = 3
+   *
+   * /kerala-psc-coaching/10th-level-exams?cid=1&subId=3
+   */
   const href =
-    `/kerala-psc-coaching/${slug}`;
+    `/kerala-psc-coaching/${slug}` +
+    `?cid=${encodeURIComponent(
+      courseId
+    )}` +
+    `&subId=${encodeURIComponent(
+      item?.id
+    )}`;
 
   const imageUrl =
     buildImageUrl(
@@ -58,7 +77,6 @@ export default function ExamCategoryCard({
       data-category-id={
         item?.id
       }
-      data-aos="fade-up"
       className="
         group
         relative
@@ -72,15 +90,12 @@ export default function ExamCategoryCard({
         shadow-[0_10px_28px_rgba(15,58,110,0.10)]
         transition-all
         duration-300
-
         hover:-translate-y-1
         hover:shadow-[0_18px_40px_rgba(15,58,110,0.18)]
-
         sm:min-h-[180px]
       "
     >
       {/* IMAGE */}
-
       {imageUrl && (
         <Image
           src={imageUrl}
@@ -100,22 +115,20 @@ export default function ExamCategoryCard({
         />
       )}
 
-      {/* IMAGE OVERLAY */}
-
+      {/* DARK OVERLAY */}
       <div
         aria-hidden="true"
         className="
           absolute
           inset-0
           bg-gradient-to-t
-          from-[#000]/90
+          from-black/90
           via-[#061a3a]/70
           to-transparent
         "
       />
 
-      {/* SUBTLE BLUE TINT */}
-
+      {/* BLUE TINT */}
       <div
         aria-hidden="true"
         className="
@@ -128,7 +141,6 @@ export default function ExamCategoryCard({
       />
 
       {/* CONTENT */}
-
       <div
         className="
           absolute
@@ -140,7 +152,6 @@ export default function ExamCategoryCard({
           justify-between
           gap-3
           p-4
-
           sm:p-5
         "
       >
@@ -152,7 +163,6 @@ export default function ExamCategoryCard({
               leading-tight
               tracking-[-0.02em]
               text-white
-
               sm:text-[19px]
             "
           >
@@ -187,7 +197,6 @@ export default function ExamCategoryCard({
             shadow-[0_8px_18px_rgba(0,0,0,0.15)]
             transition-all
             duration-300
-
             group-hover:translate-x-1
             group-hover:scale-105
           "

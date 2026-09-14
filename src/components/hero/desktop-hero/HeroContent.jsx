@@ -327,6 +327,7 @@ export default function HeroContent() {
           setShowMainCourses(false)
         }
       />
+
     </div>
   );
 }

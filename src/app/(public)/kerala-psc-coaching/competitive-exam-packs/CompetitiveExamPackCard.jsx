@@ -8,6 +8,20 @@ import {
 export default function CompetitiveExamPackCard({
   item,
 }) {
+  const title =
+    item?.package ||
+    "Competitive Exam Pack";
+
+  const tag =
+    item?.tag || "";
+
+  const image =
+    item?.imageUrl ||
+    "/assets/package-placeholder.webp";
+
+  const href =
+    `/kerala-psc-coaching/competitive-exam-packs/${item?.slug}`;
+
   return (
     <article
       data-aos="fade-up"
@@ -15,7 +29,7 @@ export default function CompetitiveExamPackCard({
         group
         relative
         overflow-hidden
-        rounded-[18px]
+        rounded-[20px]
         border
         border-[#e4edf7]
         bg-white
@@ -23,11 +37,9 @@ export default function CompetitiveExamPackCard({
         shadow-[0_8px_24px_rgba(15,58,110,0.05)]
         transition-all
         duration-300
-
         hover:-translate-y-1
         hover:border-[#cfe1f3]
         hover:shadow-[0_16px_34px_rgba(15,58,110,0.10)]
-
         sm:p-4
       "
     >
@@ -35,26 +47,23 @@ export default function CompetitiveExamPackCard({
         className="
           grid
           gap-4
-
           sm:grid-cols-[190px_minmax(0,1fr)]
           sm:items-center
         "
       >
-        {/* Image */}
         <div
           className="
             relative
             min-h-[170px]
             overflow-hidden
-            rounded-[14px]
+            rounded-[15px]
             bg-slate-100
-
             sm:min-h-[150px]
           "
         >
           <Image
-            src={item.image}
-            alt={item.title}
+            src={image}
+            alt={title}
             fill
             sizes="
               (max-width: 640px) 100vw,
@@ -69,7 +78,6 @@ export default function CompetitiveExamPackCard({
           />
         </div>
 
-        {/* Content */}
         <div
           className="
             flex
@@ -80,39 +88,32 @@ export default function CompetitiveExamPackCard({
         >
           <h3
             className="
-              text-[17px]
+              text-[18px]
               font-black
               leading-[1.2]
               tracking-[-0.025em]
               text-[#164fa5]
-
-              sm:text-[18px]
-              lg:text-[19px]
+              lg:text-[20px]
             "
           >
-            {item.title}
+            {title}
           </h3>
 
-          <p
-            className="
-              mt-2
-              text-[12px]
-              text-[#53617e]
-            "
-          >
-            Starting from{" "}
-            <span
+          {tag && (
+            <p
               className="
-                font-bold
-                text-[#0b216c]
+                mt-2
+                text-[12px]
+                font-medium
+                text-[#53617e]
               "
             >
-              {item.price}
-            </span>
-          </p>
+              {tag}
+            </p>
+          )}
 
           <Link
-            href={item.href}
+            href={href}
             className="
               group/link
               mt-5
@@ -131,7 +132,6 @@ export default function CompetitiveExamPackCard({
               text-[#f13873]
               transition-all
               duration-300
-
               hover:bg-[#f13873]
               hover:text-white
             "

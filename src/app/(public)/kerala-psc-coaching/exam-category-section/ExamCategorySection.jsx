@@ -362,12 +362,11 @@ export default function ExamCategorySection({
             categories.map(
               (item) => (
                 <ExamCategoryCard
-                  key={item.id}
-                  item={item}
-                  filePath={
-                    filePath
-                  }
-                />
+                key={item.id}
+                item={item}
+                filePath={filePath}
+                courseId={courseId}
+              />
               )
             )}
 

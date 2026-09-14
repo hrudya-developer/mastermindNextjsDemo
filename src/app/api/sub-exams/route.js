@@ -1,61 +1,83 @@
-import { NextResponse } from "next/server";
+import {
+  NextResponse,
+} from "next/server";
 
-const API_URL =
-  "http://psc.technocitysolutions.com/public/api/getHomeResponses";
+import {
+  getSubExams,
+} from "@/lib/pscApi";
 
-export async function GET() {
+export async function GET(
+  request
+) {
   try {
-    const formData = new FormData();
+    const {
+      searchParams,
+    } =
+      new URL(
+        request.url
+      );
 
-    formData.append(
-      "api",
-      process.env.PSC_API_KEY
-    );
-    formData.append("uid", "0");
-    formData.append("cid", "1");
+    const cid =
+      searchParams.get(
+        "cid"
+      );
 
-    const response = await fetch(API_URL, {
-      method: "POST",
-      body: formData,
-      cache: "no-store",
-    });
+    const subId =
+      searchParams.get(
+        "subId"
+      );
 
-    if (!response.ok) {
-      throw new Error(
-        `PSC API returned ${response.status}`
+    const uid =
+      searchParams.get(
+        "uid"
+      ) ?? "0";
+
+    if (!cid) {
+      return NextResponse.json(
+        {
+          status: false,
+          icon_path: "",
+          data: [],
+          message:
+            "Course ID is required.",
+        },
+        {
+          status: 400,
+        }
       );
     }
 
-    const result = await response.json();
+    if (!subId) {
+      return NextResponse.json(
+        {
+          status: false,
+          icon_path: "",
+          data: [],
+          message:
+            "Sub category ID is required.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
 
-    const iconBasePath = String(
-      result?.subexam_icon_path || ""
-    ).replace(/\/+$/, "");
-
-    const source = Array.isArray(
-      result?.subexams
-    )
-      ? result.subexams
-      : [];
-
-    const subExams = source
-      .filter(
-        (exam) =>
-          String(exam?.status) === "1"
-      )
-      .map((exam) => ({
-        ...exam,
-
-        imageUrl:
-          exam?.icon && iconBasePath
-            ? `${iconBasePath}/${exam.icon}`
-            : "",
-      }));
+    const result =
+      await getSubExams({
+        cid,
+        uid,
+        subId,
+      });
 
     return NextResponse.json({
-      success: true,
-      subExams,
-      iconBasePath,
+      status:
+        result.status,
+
+      icon_path:
+        result.iconPath,
+
+      data:
+        result.exams,
     });
   } catch (error) {
     console.error(
@@ -65,10 +87,11 @@ export async function GET() {
 
     return NextResponse.json(
       {
-        success: false,
-        subExams: [],
+        status: false,
+        icon_path: "",
+        data: [],
         message:
-          "Unable to load sub exams.",
+          "Unable to fetch exams.",
       },
       {
         status: 500,

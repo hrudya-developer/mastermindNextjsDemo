@@ -10,6 +10,10 @@ import {
 } from "react-dom";
 
 import {
+  useRouter,
+} from "next/navigation";
+
+import {
   X,
 } from "lucide-react";
 
@@ -17,25 +21,111 @@ import CourseOptionCard from "./CourseOptionCard";
 import ModalFooter from "./ModalFooter";
 import ModalHeader from "./ModalHeader";
 
+/* =========================================================
+   MAIN COURSE ROUTES
+
+   API:
+   1 = Kerala PSC
+   2 = RRB / SSC
+========================================================= */
+
+const COURSE_ROOTS = {
+  1: "/kerala-psc-coaching",
+  2: "/rrb-ssc-coaching",
+};
+
+/* =========================================================
+   GET COURSE ROOT
+
+   First tries API id.
+   Then falls back to course/exam name.
+========================================================= */
+
+function getCourseRoot(course) {
+  const courseId =
+    Number(course?.id);
+
+  if (COURSE_ROOTS[courseId]) {
+    return COURSE_ROOTS[courseId];
+  }
+
+  const courseName =
+    String(
+      course?.exam ??
+        course?.name ??
+        course?.title ??
+        course?.course ??
+        ""
+    )
+      .toLowerCase()
+      .trim();
+
+  if (
+    courseName.includes("kerala") ||
+    courseName.includes("psc")
+  ) {
+    return "/kerala-psc-coaching";
+  }
+
+  if (
+    courseName.includes("rrb") ||
+    courseName.includes("ssc")
+  ) {
+    return "/rrb-ssc-coaching";
+  }
+
+  return "";
+}
+
+/* =========================================================
+   CLEAN DESTINATION PATH
+========================================================= */
+
+function cleanDestinationPath(
+  value
+) {
+  return String(value ?? "")
+    .trim()
+    .replace(/^\/+/, "")
+    .replace(/\/+$/, "");
+}
+
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 export default function MainCoursesModal({
   open,
   onClose,
+  destinationPath = "",
 }) {
-  const [courses, setCourses] =
-    useState([]);
+  const router =
+    useRouter();
 
-  const [filePath, setFilePath] =
-    useState("");
+  const [
+    courses,
+    setCourses,
+  ] = useState([]);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    filePath,
+    setFilePath,
+  ] = useState("");
 
-  const [error, setError] =
-    useState("");
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
 
   /* =====================================================
      FETCH MAIN COURSES
   ===================================================== */
+
   useEffect(() => {
     if (!open) {
       return;
@@ -46,6 +136,7 @@ export default function MainCoursesModal({
     async function fetchMainCourses() {
       try {
         setLoading(true);
+
         setError("");
 
         const response =
@@ -77,7 +168,7 @@ export default function MainCoursesModal({
         }
 
         /*
-         * Exact API response:
+         * API response:
          *
          * {
          *   status: true,
@@ -108,6 +199,7 @@ export default function MainCoursesModal({
         );
 
         setCourses([]);
+
         setFilePath("");
 
         setError(
@@ -130,6 +222,7 @@ export default function MainCoursesModal({
   /* =====================================================
      LOCK BODY SCROLL
   ===================================================== */
+
   useEffect(() => {
     if (!open) {
       return;
@@ -150,13 +243,18 @@ export default function MainCoursesModal({
   /* =====================================================
      CLOSE WITH ESC
   ===================================================== */
+
   useEffect(() => {
     if (!open) {
       return;
     }
 
-    function handleKeyDown(event) {
-      if (event.key === "Escape") {
+    function handleKeyDown(
+      event
+    ) {
+      if (
+        event.key === "Escape"
+      ) {
         onClose();
       }
     }
@@ -172,11 +270,83 @@ export default function MainCoursesModal({
         handleKeyDown
       );
     };
-  }, [open, onClose]);
+  }, [
+    open,
+    onClose,
+  ]);
+
+  /* =====================================================
+     COURSE CLICK
+
+     NO destinationPath:
+     → allow CourseOptionCard's existing Link
+       to work normally.
+
+     WITH destinationPath:
+     → stop existing navigation
+     → identify PSC/RRB
+     → redirect to corresponding section.
+  ===================================================== */
+
+  function handleCourseClick(
+    event,
+    course
+  ) {
+    const destination =
+      cleanDestinationPath(
+        destinationPath
+      );
+
+    /*
+     * Normal hero modal.
+     *
+     * Example:
+     * Explore Main Courses
+     * → Kerala PSC
+     * → existing CourseOptionCard route
+     */
+    if (!destination) {
+      onClose();
+
+      return;
+    }
+
+    /*
+     * Learning Hub mode.
+     *
+     * Stop CourseOptionCard's normal Link.
+     */
+    event?.preventDefault?.();
+
+    const courseRoot =
+      getCourseRoot(course);
+
+    if (!courseRoot) {
+      console.error(
+        "Unable to determine selected main course:",
+        course
+      );
+
+      return;
+    }
+
+    const targetUrl =
+      `${courseRoot}/${destination}`;
+
+    onClose();
+
+    router.push(
+      targetUrl
+    );
+  }
 
   if (!open) {
     return null;
   }
+
+  /* =====================================================
+     MODAL
+  ===================================================== */
 
   const modal = (
     <div
@@ -195,13 +365,17 @@ export default function MainCoursesModal({
         sm:px-5
         sm:py-7
       "
-      onClick={onClose}
+      onClick={
+        onClose
+      }
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="main-courses-title"
-        onClick={(event) =>
+        onClick={(
+          event
+        ) =>
           event.stopPropagation()
         }
         className="
@@ -218,7 +392,8 @@ export default function MainCoursesModal({
           sm:rounded-[30px]
         "
       >
-        {/* Background */}
+        {/* BACKGROUND */}
+
         <div
           aria-hidden="true"
           className="
@@ -232,7 +407,8 @@ export default function MainCoursesModal({
           "
         />
 
-        {/* Top glow */}
+        {/* TOP GLOW */}
+
         <div
           aria-hidden="true"
           className="
@@ -248,7 +424,8 @@ export default function MainCoursesModal({
           "
         />
 
-        {/* Bottom glow */}
+        {/* BOTTOM GLOW */}
+
         <div
           aria-hidden="true"
           className="
@@ -264,10 +441,13 @@ export default function MainCoursesModal({
           "
         />
 
-        {/* Close */}
+        {/* CLOSE */}
+
         <button
           type="button"
-          onClick={onClose}
+          onClick={
+            onClose
+          }
           aria-label="Close main courses"
           className="
             absolute
@@ -299,7 +479,8 @@ export default function MainCoursesModal({
           <X size={18} />
         </button>
 
-        {/* Content */}
+        {/* CONTENT */}
+
         <div
           className="
             relative
@@ -315,41 +496,46 @@ export default function MainCoursesModal({
         >
           <ModalHeader />
 
-          {/* Loading */}
+          {/* LOADING */}
+
           {loading && (
             <CourseLoadingSkeleton />
           )}
 
-          {/* Error */}
-          {!loading && error && (
-            <div
-              className="
-                mt-6
-                rounded-2xl
-                border
-                border-red-100
-                bg-red-50
-                px-5
-                py-5
-                text-center
-              "
-            >
-              <p
+          {/* ERROR */}
+
+          {!loading &&
+            error && (
+              <div
                 className="
-                  text-[13px]
-                  font-medium
-                  text-red-600
+                  mt-6
+                  rounded-2xl
+                  border
+                  border-red-100
+                  bg-red-50
+                  px-5
+                  py-5
+                  text-center
                 "
               >
-                {error}
-              </p>
-            </div>
-          )}
+                <p
+                  className="
+                    text-[13px]
+                    font-medium
+                    text-red-600
+                  "
+                >
+                  {error}
+                </p>
+              </div>
+            )}
 
-          {/* Courses */}
+          {/* COURSES */}
+
           {!loading &&
             !error &&
-            courses.length > 0 && (
+            courses.length >
+              0 && (
               <div
                 className="
                   mt-6
@@ -360,7 +546,9 @@ export default function MainCoursesModal({
                 "
               >
                 {courses.map(
-                  (course) => (
+                  (
+                    course
+                  ) => (
                     <CourseOptionCard
                       key={
                         course?.id
@@ -371,8 +559,13 @@ export default function MainCoursesModal({
                       filePath={
                         filePath
                       }
-                      onClick={
-                        onClose
+                      onClick={(
+                        event
+                      ) =>
+                        handleCourseClick(
+                          event,
+                          course
+                        )
                       }
                     />
                   )
@@ -380,10 +573,12 @@ export default function MainCoursesModal({
               </div>
             )}
 
-          {/* Empty */}
+          {/* EMPTY */}
+
           {!loading &&
             !error &&
-            courses.length === 0 && (
+            courses.length ===
+              0 && (
               <div
                 className="
                   mt-6
@@ -402,7 +597,8 @@ export default function MainCoursesModal({
                     text-slate-500
                   "
                 >
-                  No courses are currently
+                  No courses are
+                  currently
                   available.
                 </p>
               </div>
@@ -420,6 +616,10 @@ export default function MainCoursesModal({
   );
 }
 
+/* =========================================================
+   LOADING SKELETON
+========================================================= */
+
 function CourseLoadingSkeleton() {
   return (
     <div
@@ -431,59 +631,61 @@ function CourseLoadingSkeleton() {
         sm:grid-cols-2
       "
     >
-      {[1, 2].map((item) => (
-        <div
-          key={item}
-          className="
-            min-h-[210px]
-            animate-pulse
-            rounded-[22px]
-            border
-            border-slate-100
-            bg-slate-50
-            p-5
-          "
-        >
+      {[1, 2].map(
+        (item) => (
           <div
+            key={item}
             className="
-              h-[58px]
-              w-[58px]
-              rounded-[17px]
-              bg-slate-200
+              min-h-[210px]
+              animate-pulse
+              rounded-[22px]
+              border
+              border-slate-100
+              bg-slate-50
+              p-5
             "
-          />
+          >
+            <div
+              className="
+                h-[58px]
+                w-[58px]
+                rounded-[17px]
+                bg-slate-200
+              "
+            />
 
-          <div
-            className="
-              mt-4
-              h-5
-              w-28
-              rounded
-              bg-slate-200
-            "
-          />
+            <div
+              className="
+                mt-4
+                h-5
+                w-28
+                rounded
+                bg-slate-200
+              "
+            />
 
-          <div
-            className="
-              mt-3
-              h-3
-              w-full
-              rounded
-              bg-slate-200
-            "
-          />
+            <div
+              className="
+                mt-3
+                h-3
+                w-full
+                rounded
+                bg-slate-200
+              "
+            />
 
-          <div
-            className="
-              mt-2
-              h-3
-              w-[70%]
-              rounded
-              bg-slate-200
-            "
-          />
-        </div>
-      ))}
+            <div
+              className="
+                mt-2
+                h-3
+                w-[70%]
+                rounded
+                bg-slate-200
+              "
+            />
+          </div>
+        )
+      )}
     </div>
   );
 }

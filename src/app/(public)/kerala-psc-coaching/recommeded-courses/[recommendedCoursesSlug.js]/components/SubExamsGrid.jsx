@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
+
 import Link from "next/link";
 
 import {
@@ -10,14 +14,59 @@ import {
 
 import SubExamCard from "./SubExamCard";
 
-export default function SubExamsGrid() {
-  const [subExams, setSubExams] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+const COURSE_ID = 1;
+const USER_ID = 0;
+const MAX_EXAMS = 7;
 
-  /* =====================================================
-     FETCH SUB EXAMS
-  ====================================================== */
+/* =========================================================
+   IMAGE URL
+========================================================= */
+
+function buildImageUrl(
+  iconPath,
+  icon
+) {
+  if (
+    !iconPath ||
+    !icon
+  ) {
+    return "";
+  }
+
+  const cleanPath =
+    String(iconPath).replace(
+      /\/+$/,
+      ""
+    );
+
+  const cleanIcon =
+    String(icon).replace(
+      /^\/+/,
+      ""
+    );
+
+  return `${cleanPath}/${cleanIcon}`;
+}
+
+/* =========================================================
+   SUB EXAMS GRID
+========================================================= */
+
+export default function SubExamsGrid() {
+  const [
+    subExams,
+    setSubExams,
+  ] = useState([]);
+
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -27,41 +76,203 @@ export default function SubExamsGrid() {
         setLoading(true);
         setError("");
 
-        const response = await fetch(
-          "/api/sub-exams",
-          {
-            method: "GET",
-            cache: "no-store",
-          }
-        );
+        /* =================================================
+           STEP 1
+           GET ALL KERALA PSC CATEGORIES
+        ================================================= */
 
-        const result =
-          await response.json();
+        const categoryResponse =
+          await fetch(
+            `/api/exam-category-section?cid=${COURSE_ID}&uid=${USER_ID}`,
+            {
+              method: "GET",
+              cache: "no-store",
+            }
+          );
 
-        if (!response.ok) {
+        const categoryResult =
+          await categoryResponse.json();
+
+        if (!categoryResponse.ok) {
           throw new Error(
-            result?.message ||
-              "Unable to load sub exams."
+            categoryResult?.message ||
+              "Unable to load exam categories."
           );
         }
 
-        if (!active) return;
+        const categories =
+          Array.isArray(
+            categoryResult?.data
+          )
+            ? categoryResult.data
+            : [];
 
-        const source =
-          Array.isArray(result?.subExams)
-            ? result.subExams
-            : Array.isArray(result?.subexams)
-              ? result.subexams
-              : [];
+        if (
+          categories.length === 0
+        ) {
+          if (active) {
+            setSubExams([]);
+          }
 
-        setSubExams(source);
+          return;
+        }
+
+        /* =================================================
+           STEP 2
+           FETCH EXAMS FROM EACH CATEGORY
+
+           Example:
+           id 3 -> 10th Level
+           id 2 -> 12th Level
+           id 1 -> Degree Level
+           id 7 -> Nursing
+        ================================================= */
+
+        const requests =
+          categories.map(
+            async (category) => {
+              try {
+                const subId =
+                  category?.id;
+
+                if (!subId) {
+                  return [];
+                }
+
+                const response =
+                  await fetch(
+                    `/api/sub-exams?cid=${COURSE_ID}&subId=${encodeURIComponent(
+                      subId
+                    )}&uid=${USER_ID}`,
+                    {
+                      method:
+                        "GET",
+                      cache:
+                        "no-store",
+                    }
+                  );
+
+                if (!response.ok) {
+                  return [];
+                }
+
+                const result =
+                  await response.json();
+
+                const exams =
+                  Array.isArray(
+                    result?.data
+                  )
+                    ? result.data
+                    : [];
+
+                const iconPath =
+                  String(
+                    result?.icon_path ??
+                      ""
+                  );
+
+                /* =========================================
+                   NORMALIZE EXAM DATA
+
+                   Your SubExamCard currently expects:
+                   exam.imageUrl
+                ========================================= */
+
+                return exams.map(
+                  (exam) => ({
+                    ...exam,
+
+                    categoryId:
+                      category?.id,
+
+                    categoryName:
+                      category?.name ||
+                      "",
+
+                    imageUrl:
+                      buildImageUrl(
+                        iconPath,
+
+                        exam?.icon ||
+                          exam?.newicon ||
+                          exam?.icon_large
+                      ),
+                  })
+                );
+              } catch (error) {
+                console.error(
+                  `Unable to load exams for category ${category?.id}:`,
+                  error
+                );
+
+                return [];
+              }
+            }
+          );
+
+        const results =
+          await Promise.all(
+            requests
+          );
+
+        if (!active) {
+          return;
+        }
+
+        /* =================================================
+           STEP 3
+           FLATTEN ALL CATEGORY RESULTS
+        ================================================= */
+
+        const allExams =
+          results.flat();
+
+        /* =================================================
+           STEP 4
+           REMOVE DUPLICATES
+        ================================================= */
+
+        const uniqueExams =
+          Array.from(
+            new Map(
+              allExams.map(
+                (exam) => [
+                  String(
+                    exam?.id
+                  ),
+                  exam,
+                ]
+              )
+            ).values()
+          );
+
+        /* =================================================
+           STEP 5
+           SHOW ONLY LIMITED RECOMMENDED EXAMS
+
+           7 exam cards + 1 register card
+           = 8 cards total
+        ================================================= */
+
+        const recommended =
+          uniqueExams.slice(
+            0,
+            MAX_EXAMS
+          );
+
+        setSubExams(
+          recommended
+        );
       } catch (error) {
         console.error(
-          "Sub exam fetch error:",
+          "Recommended exams fetch error:",
           error
         );
 
         if (active) {
+          setSubExams([]);
+
           setError(
             "Unable to load exams."
           );
@@ -80,9 +291,9 @@ export default function SubExamsGrid() {
     };
   }, []);
 
-  /* =====================================================
+  /* =========================================================
      LOADING
-  ====================================================== */
+  ========================================================= */
 
   if (loading) {
     return (
@@ -92,7 +303,6 @@ export default function SubExamsGrid() {
           auto-rows-[160px]
           grid-cols-1
           gap-3
-
           sm:grid-cols-2
           md:grid-cols-3
           lg:grid-cols-4
@@ -100,24 +310,28 @@ export default function SubExamsGrid() {
       >
         {Array.from({
           length: 8,
-        }).map((_, index) => (
-          <div
-            key={index}
-            className="
-              h-full
-              animate-pulse
-              rounded-[20px]
-              bg-slate-100
-            "
-          />
-        ))}
+        }).map(
+          (_, index) => (
+            <div
+              key={index}
+              className="
+                h-full
+                animate-pulse
+                rounded-[20px]
+                border
+                border-[#164fa5]/5
+                bg-slate-100
+              "
+            />
+          )
+        )}
       </div>
     );
   }
 
-  /* =====================================================
+  /* =========================================================
      ERROR
-  ====================================================== */
+  ========================================================= */
 
   if (error) {
     return (
@@ -138,9 +352,36 @@ export default function SubExamsGrid() {
     );
   }
 
-  /* =====================================================
+  /* =========================================================
+     EMPTY
+  ========================================================= */
+
+  if (
+    subExams.length === 0
+  ) {
+    return (
+      <div
+        className="
+          rounded-[18px]
+          border
+          border-[#dce8f7]
+          bg-white
+          px-5
+          py-8
+          text-center
+          text-sm
+          text-slate-500
+        "
+      >
+        No recommended exams are
+        currently available.
+      </div>
+    );
+  }
+
+  /* =========================================================
      GRID
-  ====================================================== */
+  ========================================================= */
 
   return (
     <div
@@ -149,23 +390,25 @@ export default function SubExamsGrid() {
         auto-rows-[160px]
         grid-cols-1
         gap-3
-
         sm:grid-cols-2
         md:grid-cols-3
         lg:grid-cols-4
       "
     >
-      {/* API SUB EXAMS */}
-      {subExams.map((exam) => (
-        <SubExamCard
-          key={exam.id}
-          exam={exam}
-        />
-      ))}
+      {/* EXAM CARDS */}
 
-      {/* =================================================
+      {subExams.map(
+        (exam) => (
+          <SubExamCard
+            key={exam?.id}
+            exam={exam}
+          />
+        )
+      )}
+
+      {/* =====================================================
           REGISTER WITH US
-      ================================================== */}
+      ====================================================== */}
 
       <Link
         href="/register"
@@ -187,12 +430,12 @@ export default function SubExamsGrid() {
           shadow-[0_14px_34px_rgba(11,33,108,0.20)]
           transition
           duration-300
-
           hover:-translate-y-1
           hover:shadow-[0_20px_42px_rgba(11,33,108,0.28)]
         "
       >
         {/* TOP GRADIENT */}
+
         <div
           aria-hidden="true"
           className="
@@ -208,7 +451,8 @@ export default function SubExamsGrid() {
           "
         />
 
-        {/* GRID PATTERN */}
+        {/* GRID */}
+
         <div
           aria-hidden="true"
           className="
@@ -221,6 +465,7 @@ export default function SubExamsGrid() {
         />
 
         {/* CYAN GLOW */}
+
         <div
           aria-hidden="true"
           className="
@@ -237,6 +482,7 @@ export default function SubExamsGrid() {
         />
 
         {/* PINK GLOW */}
+
         <div
           aria-hidden="true"
           className="
@@ -263,6 +509,7 @@ export default function SubExamsGrid() {
           "
         >
           {/* TOP */}
+
           <div
             className="
               flex
@@ -278,12 +525,13 @@ export default function SubExamsGrid() {
                 w-9
                 shrink-0
                 items-center
-                justify-center             
+                justify-center
                 text-pink-400
-                backdrop-blur-md
               "
             >
-              <UserPlus size={17} />
+              <UserPlus
+                size={17}
+              />
             </div>
 
             <div
@@ -301,17 +549,19 @@ export default function SubExamsGrid() {
                 text-white
                 transition
                 duration-300
-
                 group-hover:-translate-y-0.5
                 group-hover:translate-x-0.5
                 group-hover:bg-white/20
               "
             >
-              <ArrowUpRight size={14} />
+              <ArrowUpRight
+                size={14}
+              />
             </div>
           </div>
 
           {/* CONTENT */}
+
           <div className="mt-auto">
             <p
               className="
@@ -347,9 +597,10 @@ export default function SubExamsGrid() {
                 text-white/55
               "
             >
-              Join Mastermind and start
-              your exam preparation with
-              expert guidance.
+              Join Mastermind and
+              start your exam
+              preparation with expert
+              guidance.
             </p>
 
             <span
@@ -367,7 +618,9 @@ export default function SubExamsGrid() {
             >
               Register Now
 
-              <ArrowUpRight size={12} />
+              <ArrowUpRight
+                size={12}
+              />
             </span>
           </div>
         </div>

@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import {
   ArrowRight,
+  Bell,
   BookOpen,
   CalendarDays,
   GraduationCap,
@@ -320,53 +321,48 @@ export default function KeralaPscHero() {
 
         {/* CTA */}
         <Link
-          href="/kerala-psc-coaching"
-          className="
-            group
-            mt-6
-            inline-flex
-            w-fit
-            items-center
-            justify-center
-            gap-3
-            rounded-full
+  href="/kerala-psc-coaching/psc-notifications"
+  className="
+    group
+    mt-6
+    inline-flex
+    w-fit
+    items-center
+    justify-center
+    gap-2.5
+    rounded-full
+    bg-gradient-to-r
+    from-[#f13873]
+    via-[#ff2d78]
+    to-[#ff4f8c]
+    px-6
+    py-3.5
+    text-[12px]
+    font-bold
+    text-white
+    shadow-[0_12px_30px_rgba(241,56,115,0.38)]
+    transition-all
+    duration-300
+    hover:-translate-y-0.5
+    hover:shadow-[0_18px_38px_rgba(241,56,115,0.48)]
+    sm:px-7
+    sm:text-[13px]
+  "
+>
+  <Bell className="h-4 w-4" />
 
-            bg-gradient-to-r
-            from-[#f13873]
-            via-[#ff2d78]
-            to-[#ff4f8c]
+  <span>Check PSC Notifications</span>
 
-            px-6
-            py-3.5
-
-            text-[12px]
-            font-bold
-            text-white
-
-            shadow-[0_12px_30px_rgba(241,56,115,0.38)]
-
-            transition-all
-            duration-300
-
-            hover:-translate-y-0.5
-            hover:shadow-[0_18px_38px_rgba(241,56,115,0.48)]
-
-            sm:px-7
-            sm:text-[13px]
-          "
-        >
-          Start Learning
-
-          <ArrowRight
-            className="
-              h-4
-              w-4
-              transition-transform
-              duration-300
-              group-hover:translate-x-1
-            "
-          />
-        </Link>
+  <ArrowRight
+    className="
+      h-4
+      w-4
+      transition-transform
+      duration-300
+      group-hover:translate-x-1
+    "
+  />
+</Link>
 
         {/* Stats */}
         <div

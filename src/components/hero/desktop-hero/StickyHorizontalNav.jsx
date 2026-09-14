@@ -25,6 +25,8 @@ import {
   leftMenu,
 } from "./data";
 
+import MainCoursesModal from "@/components/main-course-modal/MainCoursesModal";
+
 export default function StickyHorizontalNav() {
   const pathname = usePathname();
 
@@ -38,9 +40,15 @@ export default function StickyHorizontalNav() {
     setLearningHubOpen,
   ] = useState(false);
 
+  const [
+    selectedLearningItem,
+    setSelectedLearningItem,
+  ] = useState(null);
+
   /* =====================================================
       CLOSE MENUS AFTER ROUTE CHANGE
   ===================================================== */
+
   useEffect(() => {
     setMobileMenuOpen(false);
     setLearningHubOpen(false);
@@ -49,13 +57,15 @@ export default function StickyHorizontalNav() {
   /* =====================================================
       LOCK BODY ON MOBILE
   ===================================================== */
+
   useEffect(() => {
     if (!mobileMenuOpen) {
       document.body.style.overflow = "";
       return;
     }
 
-    document.body.style.overflow = "hidden";
+    document.body.style.overflow =
+      "hidden";
 
     return () => {
       document.body.style.overflow = "";
@@ -65,6 +75,7 @@ export default function StickyHorizontalNav() {
   /* =====================================================
       ACTIVE LINK
   ===================================================== */
+
   const isActiveLink = (href) => {
     if (!href) {
       return false;
@@ -81,16 +92,48 @@ export default function StickyHorizontalNav() {
     return pathname.startsWith(href);
   };
 
-  const isLearningHubActive = (item) =>
-    item.children?.some((child) =>
-      isActiveLink(child.href)
+  /* =====================================================
+      LEARNING HUB ACTIVE
+  ===================================================== */
+
+  const isLearningHubActive = (
+    item
+  ) =>
+    item.children?.some(
+      (child) => {
+        if (!child?.path) {
+          return false;
+        }
+
+        return (
+          pathname.includes(
+            `/${child.path}`
+          )
+        );
+      }
     );
+
+  /* =====================================================
+      OPEN LEARNING HUB MODAL
+  ===================================================== */
+
+  function handleLearningItemClick(
+    child
+  ) {
+    setSelectedLearningItem(
+      child
+    );
+
+    setLearningHubOpen(false);
+    setMobileMenuOpen(false);
+  }
 
   return (
     <>
       {/* =====================================================
           DESKTOP NAVBAR
       ===================================================== */}
+
       <header
         className="
           fixed
@@ -123,6 +166,7 @@ export default function StickyHorizontalNav() {
           "
         >
           {/* LOGO */}
+
           <Link
             href="/"
             aria-label="MasterMind Home"
@@ -152,6 +196,7 @@ export default function StickyHorizontalNav() {
           {/* =================================================
               DESKTOP NAVIGATION
           ================================================= */}
+
           <nav
             className="
               flex
@@ -169,233 +214,251 @@ export default function StickyHorizontalNav() {
                 gap-1
               "
             >
-              {leftMenu.map((item) => {
-                const hasChildren =
-                  Array.isArray(item.children);
+              {leftMenu.map(
+                (item) => {
+                  const hasChildren =
+                    Array.isArray(
+                      item.children
+                    );
 
-                const active = hasChildren
-                  ? isLearningHubActive(item)
-                  : isActiveLink(item.href);
+                  const active =
+                    hasChildren
+                      ? isLearningHubActive(
+                          item
+                        )
+                      : isActiveLink(
+                          item.href
+                        );
 
-                /* =============================================
-                    LEARNING HUB DROPDOWN
-                ============================================= */
-                if (hasChildren) {
-                  return (
-                    <div
-                      key={item.label}
-                      className="group/dropdown relative"
-                    >
-                      <button
-                        type="button"
-                        className={`
-                          group
-                          flex
-                          min-w-[92px]
-                          flex-col
-                          items-center
-                          justify-center
-                          gap-1
-                          rounded-[16px]
-                          px-3
-                          py-2
-                          transition-all
-                          duration-300
-                          xl:min-w-[105px]
+                  /* =============================================
+                      LEARNING HUB DROPDOWN
+                  ============================================= */
 
-                          ${
-                            active
-                              ? `
-                                  bg-gradient-to-br
-                                  from-[#edf8ff]
-                                  to-[#cfefff]
-                                  text-[#164fa5]
-                                  shadow-[0_8px_20px_rgba(1,124,192,0.10)]
-                                `
-                              : `
-                                  text-[#07194f]
-                                  hover:bg-[#f2f8ff]
-                                  hover:text-[#017cc0]
-                                `
-                          }
-                        `}
+                  if (
+                    hasChildren
+                  ) {
+                    return (
+                      <div
+                        key={
+                          item.label
+                        }
+                        className="
+                          group/dropdown
+                          relative
+                        "
                       >
-                        <span
-                          className="
+                        <button
+                          type="button"
+                          className={`
+                            group
                             flex
-                            h-7
+                            min-w-[92px]
+                            flex-col
                             items-center
                             justify-center
                             gap-1
-                            text-[18px]
+                            rounded-[16px]
+                            px-3
+                            py-2
+                            transition-all
+                            duration-300
+                            xl:min-w-[105px]
+
+                            ${
+                              active
+                                ? `
+                                    bg-gradient-to-br
+                                    from-[#edf8ff]
+                                    to-[#cfefff]
+                                    text-[#164fa5]
+                                    shadow-[0_8px_20px_rgba(1,124,192,0.10)]
+                                  `
+                                : `
+                                    text-[#07194f]
+                                    hover:bg-[#f2f8ff]
+                                    hover:text-[#017cc0]
+                                  `
+                            }
+                          `}
+                        >
+                          <span
+                            className="
+                              flex
+                              h-7
+                              items-center
+                              justify-center
+                              gap-1
+                              text-[18px]
+                            "
+                          >
+                            {
+                              item.icon
+                            }
+
+                            <ChevronDown
+                              className="
+                                h-3
+                                w-3
+                                transition-transform
+                                duration-300
+                                group-hover/dropdown:rotate-180
+                              "
+                            />
+                          </span>
+
+                          <span
+                            className="
+                              whitespace-nowrap
+                              text-[11px]
+                              font-semibold
+                              xl:text-[12px]
+                            "
+                          >
+                            {
+                              item.label
+                            }
+                          </span>
+                        </button>
+
+                        {/* DROPDOWN */}
+
+                        <div
+                          className="
+                            invisible
+                            absolute
+                            left-1/2
+                            top-[calc(100%+8px)]
+                            w-[620px]
+                            -translate-x-1/2
+                            translate-y-2
+                            opacity-0
+                            transition-all
+                            duration-200
+                            group-hover/dropdown:visible
+                            group-hover/dropdown:translate-y-0
+                            group-hover/dropdown:opacity-100
                           "
                         >
-                          {item.icon}
-
-                          <ChevronDown
+                          <div
                             className="
-                              h-3
-                              w-3
-                              transition-transform
-                              duration-300
-                              group-hover/dropdown:rotate-180
+                              absolute
+                              -top-3
+                              left-0
+                              h-4
+                              w-full
                             "
                           />
-                        </span>
 
-                        <span
-                          className="
-                            whitespace-nowrap
-                            text-[11px]
-                            font-semibold
-                            xl:text-[12px]
-                          "
-                        >
-                          {item.label}
-                        </span>
-                      </button>
-
-                      {/* DROPDOWN */}
-                      <div
-                        className="
-                          invisible
-                          absolute
-                          left-1/2
-                          top-[calc(100%+8px)]
-                          w-[620px]
-                          -translate-x-1/2
-                          translate-y-2
-                          opacity-0
-                          transition-all
-                          duration-200
-                          group-hover/dropdown:visible
-                          group-hover/dropdown:translate-y-0
-                          group-hover/dropdown:opacity-100
-                        "
-                      >
-                        {/* Invisible bridge prevents dropdown closing */}
-                        <div
-                          className="
-                            absolute
-                            -top-3
-                            left-0
-                            h-4
-                            w-full
-                          "
-                        />
-
-                        <div
-                          className="
-                            relative
-                            overflow-hidden
-                            rounded-[22px]
-                            border
-                            border-[#dceafa]
-                            bg-white
-                            p-3
-                            shadow-[0_24px_60px_rgba(8,31,92,0.16)]
-                          "
-                        >
-                          {/* Header */}
                           <div
                             className="
-                              mb-2
-                              flex
-                              items-center
-                              gap-3
-                              rounded-[15px]
-                              bg-gradient-to-r
-                              from-[#edf8ff]
-                              to-[#f5f0ff]
-                              px-4
-                              py-3
+                              relative
+                              overflow-hidden
+                              rounded-[22px]
+                              border
+                              border-[#dceafa]
+                              bg-white
+                              p-3
+                              shadow-[0_24px_60px_rgba(8,31,92,0.16)]
                             "
                           >
+                            {/* HEADER */}
+
                             <div
                               className="
+                                mb-2
                                 flex
-                                h-10
-                                w-10
                                 items-center
-                                justify-center
-                                rounded-xl
-                                bg-[#075ee7]
-                                text-white
+                                gap-3
+                                rounded-[15px]
+                                bg-gradient-to-r
+                                from-[#edf8ff]
+                                to-[#f5f0ff]
+                                px-4
+                                py-3
                               "
                             >
-                              <GraduationCap
-                                size={20}
-                              />
-                            </div>
-
-                            <div>
-                              <p
+                              <div
                                 className="
-                                  text-sm
-                                  font-black
-                                  text-[#082b7a]
+                                  flex
+                                  h-10
+                                  w-10
+                                  items-center
+                                  justify-center
+                                  rounded-xl
+                                  bg-[#075ee7]
+                                  text-white
                                 "
                               >
-                                Learning Hub
-                              </p>
+                                <GraduationCap
+                                  size={
+                                    20
+                                  }
+                                />
+                              </div>
 
-                              <p
-                                className="
-                                  text-[11px]
-                                  text-[#7085a8]
-                                "
-                              >
-                                Everything you need
-                                for smarter PSC
-                                preparation.
-                              </p>
+                              <div>
+                                <p
+                                  className="
+                                    text-sm
+                                    font-black
+                                    text-[#082b7a]
+                                  "
+                                >
+                                  Learning
+                                  Hub
+                                </p>
+
+                                <p
+                                  className="
+                                    text-[11px]
+                                    text-[#7085a8]
+                                  "
+                                >
+                                  Everything
+                                  you need
+                                  for smarter
+                                  preparation.
+                                </p>
+                              </div>
                             </div>
-                          </div>
 
-                          {/* LINKS */}
-                          <div
-                            className="
-                              grid
-                              grid-cols-2
-                              gap-1
-                            "
-                          >
-                            {item.children.map(
-                              (child) => {
-                                const childActive =
-                                  isActiveLink(
-                                    child.href
-                                  );
+                            {/* ITEMS */}
 
-                                return (
-                                  <Link
+                            <div
+                              className="
+                                grid
+                                grid-cols-2
+                                gap-1
+                              "
+                            >
+                              {item.children.map(
+                                (
+                                  child
+                                ) => (
+                                  <button
                                     key={
                                       child.title
                                     }
-                                    href={
-                                      child.href
+                                    type="button"
+                                    onClick={() =>
+                                      handleLearningItemClick(
+                                        child
+                                      )
                                     }
-                                    className={`
+                                    className="
                                       group/item
                                       flex
+                                      w-full
                                       items-center
                                       gap-3
                                       rounded-[14px]
                                       px-3
                                       py-3
+                                      text-left
                                       transition-all
                                       duration-200
-
-                                      ${
-                                        childActive
-                                          ? `
-                                              bg-[#edf7ff]
-                                            `
-                                          : `
-                                              hover:bg-[#f4f9ff]
-                                            `
-                                      }
-                                    `}
+                                      hover:bg-[#f4f9ff]
+                                    "
                                   >
                                     <span
                                       className="
@@ -458,98 +521,97 @@ export default function StickyHorizontalNav() {
                                         group-hover/item:text-[#087ee9]
                                       "
                                     />
-                                  </Link>
-                                );
-                              }
-                            )}
+                                  </button>
+                                )
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                }
+                    );
+                  }
 
-                /* =============================================
-                    NORMAL MENU ITEM
-                ============================================= */
-                return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className={`
-                      group
-                      flex
-                      min-w-[72px]
-                      flex-col
-                      items-center
-                      justify-center
-                      gap-1.5
-                      rounded-[16px]
-                      px-2
-                      py-2
-                      transition-all
-                      duration-300
-                      xl:min-w-[84px]
-                      xl:px-3
+                  /* =============================================
+                      NORMAL MENU ITEM
+                  ============================================= */
 
-                      ${
-                        active
-                          ? `
-                              bg-gradient-to-br
-                              from-[#edf8ff]
-                              to-[#cfefff]
-                              text-[#164fa5]
-                              shadow-[0_8px_20px_rgba(1,124,192,0.10)]
-                            `
-                          : `
-                              text-[#07194f]
-                              hover:bg-[#f2f8ff]
-                              hover:text-[#017cc0]
-                            `
+                  return (
+                    <Link
+                      key={
+                        item.label
                       }
-                    `}
-                  >
-                    <span
+                      href={
+                        item.href
+                      }
                       className={`
+                        group
                         flex
-                        h-7
-                        w-7
+                        min-w-[72px]
+                        flex-col
                         items-center
                         justify-center
-                        text-[19px]
+                        gap-1.5
+                        rounded-[16px]
+                        px-2
+                        py-2
+                        transition-all
+                        duration-300
+                        xl:min-w-[84px]
+                        xl:px-3
 
                         ${
                           active
-                            ? "text-[#017cc0]"
+                            ? `
+                                bg-gradient-to-br
+                                from-[#edf8ff]
+                                to-[#cfefff]
+                                text-[#164fa5]
+                                shadow-[0_8px_20px_rgba(1,124,192,0.10)]
+                              `
                             : `
-                                text-[#081f5c]
-                                group-hover:text-[#017cc0]
+                                text-[#07194f]
+                                hover:bg-[#f2f8ff]
+                                hover:text-[#017cc0]
                               `
                         }
                       `}
                     >
-                      {item.icon}
-                    </span>
+                      <span
+                        className="
+                          flex
+                          h-7
+                          w-7
+                          items-center
+                          justify-center
+                          text-[19px]
+                        "
+                      >
+                        {
+                          item.icon
+                        }
+                      </span>
 
-                    <span
-                      className="
-                        whitespace-nowrap
-                        text-[11px]
-                        font-semibold
-                        xl:text-[12px]
-                      "
-                    >
-                      {item.label}
-                    </span>
-                  </Link>
-                );
-              })}
+                      <span
+                        className="
+                          whitespace-nowrap
+                          text-[11px]
+                          font-semibold
+                          xl:text-[12px]
+                        "
+                      >
+                        {
+                          item.label
+                        }
+                      </span>
+                    </Link>
+                  );
+                }
+              )}
             </div>
           </nav>
 
-          {/* =================================================
-              LOGIN
-          ================================================= */}
+          {/* LOGIN */}
+
           <div
             className="
               ml-3
@@ -582,12 +644,10 @@ export default function StickyHorizontalNav() {
                 transition-all
                 duration-300
                 hover:-translate-y-0.5
-                hover:shadow-[0_16px_35px_rgba(3,76,196,0.28)]
               "
             >
               <LogIn
                 size={18}
-                strokeWidth={2}
               />
 
               Login
@@ -597,8 +657,9 @@ export default function StickyHorizontalNav() {
       </header>
 
       {/* =====================================================
-          MOBILE + TABLET NAVBAR
+          MOBILE + TABLET
       ===================================================== */}
+
       <header
         className="
           fixed
@@ -625,12 +686,12 @@ export default function StickyHorizontalNav() {
             sm:px-6
           "
         >
-          {/* LOGO */}
           <Link
             href="/"
-            aria-label="MasterMind Home"
             onClick={() =>
-              setMobileMenuOpen(false)
+              setMobileMenuOpen(
+                false
+              )
             }
           >
             <Image
@@ -648,18 +709,14 @@ export default function StickyHorizontalNav() {
             />
           </Link>
 
-          {/* HAMBURGER */}
           <button
             type="button"
-            aria-label={
-              mobileMenuOpen
-                ? "Close navigation"
-                : "Open navigation"
-            }
-            aria-expanded={mobileMenuOpen}
             onClick={() =>
               setMobileMenuOpen(
-                (previous) => !previous
+                (
+                  previous
+                ) =>
+                  !previous
               )
             }
             className="
@@ -673,28 +730,20 @@ export default function StickyHorizontalNav() {
               border-[#164fa5]/10
               bg-[#edf7ff]
               text-[#0755b9]
-              shadow-[0_5px_15px_rgba(22,79,165,0.08)]
-              transition-all
-              active:scale-95
             "
           >
             {mobileMenuOpen ? (
               <X
                 size={23}
-                strokeWidth={2.3}
               />
             ) : (
               <Menu
                 size={24}
-                strokeWidth={2.3}
               />
             )}
           </button>
         </div>
 
-        {/* =================================================
-            MOBILE MENU
-        ================================================= */}
         <div
           className={`
             absolute
@@ -703,26 +752,20 @@ export default function StickyHorizontalNav() {
             top-full
             overflow-hidden
             border-t
-            border-[#164fa5]/5
-            bg-white/98
-            shadow-[0_20px_40px_rgba(8,31,92,0.12)]
-            backdrop-blur-2xl
+            bg-white
             transition-all
             duration-300
-            ease-out
 
             ${
               mobileMenuOpen
                 ? `
                     visible
                     max-h-[calc(100vh-68px)]
-                    translate-y-0
                     opacity-100
                   `
                 : `
                     invisible
                     max-h-0
-                    -translate-y-2
                     opacity-0
                   `
             }
@@ -735,122 +778,88 @@ export default function StickyHorizontalNav() {
               px-4
               pb-5
               pt-3
-              sm:px-6
             "
           >
             <div className="flex flex-col gap-1">
-              {leftMenu.map((item) => {
-                const hasChildren =
-                  Array.isArray(item.children);
+              {leftMenu.map(
+                (item) => {
+                  const hasChildren =
+                    Array.isArray(
+                      item.children
+                    );
 
-                const active = hasChildren
-                  ? isLearningHubActive(item)
-                  : isActiveLink(item.href);
-
-                /* ===========================================
-                    MOBILE LEARNING HUB
-                =========================================== */
-                if (hasChildren) {
-                  return (
-                    <div
-                      key={item.label}
-                      className="
-                        overflow-hidden
-                        rounded-xl
-                      "
-                    >
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setLearningHubOpen(
-                            (previous) =>
-                              !previous
-                          )
+                  if (
+                    hasChildren
+                  ) {
+                    return (
+                      <div
+                        key={
+                          item.label
                         }
-                        className={`
-                          flex
-                          min-h-[54px]
-                          w-full
-                          items-center
-                          gap-3
-                          rounded-xl
-                          px-3
-                          text-left
-                          text-[14px]
-                          font-semibold
-                          transition-all
-
-                          ${
-                            active ||
-                            learningHubOpen
-                              ? `
-                                  bg-[#edf7ff]
-                                  text-[#0755b9]
-                                `
-                              : `
-                                  text-[#1f3158]
-                                  hover:bg-[#f4f9ff]
-                                `
-                          }
-                        `}
                       >
-                        <span
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setLearningHubOpen(
+                              (
+                                previous
+                              ) =>
+                                !previous
+                            )
+                          }
                           className="
                             flex
-                            h-9
-                            w-9
-                            shrink-0
+                            min-h-[54px]
+                            w-full
                             items-center
-                            justify-center
-                            rounded-[10px]
-                            bg-[#dff1ff]
-                            text-lg
+                            gap-3
+                            rounded-xl
+                            px-3
+                            text-left
+                            text-[14px]
+                            font-semibold
+                            text-[#1f3158]
+                            hover:bg-[#f4f9ff]
                           "
                         >
-                          {item.icon}
-                        </span>
-
-                        <span className="flex-1">
-                          {item.label}
-                        </span>
-
-                        <ChevronDown
-                          className={`
-                            h-4
-                            w-4
-                            transition-transform
-                            duration-300
-
-                            ${
-                              learningHubOpen
-                                ? "rotate-180"
-                                : ""
+                          <span
+                            className="
+                              flex
+                              h-9
+                              w-9
+                              items-center
+                              justify-center
+                              rounded-[10px]
+                              bg-[#dff1ff]
+                            "
+                          >
+                            {
+                              item.icon
                             }
-                          `}
-                        />
-                      </button>
+                          </span>
 
-                      {/* MOBILE SUBMENU */}
-                      <div
-                        className={`
-                          grid
-                          transition-all
-                          duration-300
+                          <span className="flex-1">
+                            {
+                              item.label
+                            }
+                          </span>
 
-                          ${
-                            learningHubOpen
-                              ? `
-                                  grid-rows-[1fr]
-                                  opacity-100
-                                `
-                              : `
-                                  grid-rows-[0fr]
-                                  opacity-0
-                                `
-                          }
-                        `}
-                      >
-                        <div className="overflow-hidden">
+                          <ChevronDown
+                            className={`
+                              h-4
+                              w-4
+                              transition-transform
+
+                              ${
+                                learningHubOpen
+                                  ? "rotate-180"
+                                  : ""
+                              }
+                            `}
+                          />
+                        </button>
+
+                        {learningHubOpen && (
                           <div
                             className="
                               ml-5
@@ -863,26 +872,28 @@ export default function StickyHorizontalNav() {
                             "
                           >
                             {item.children.map(
-                              (child) => (
-                                <Link
+                              (
+                                child
+                              ) => (
+                                <button
                                   key={
                                     child.title
                                   }
-                                  href={
-                                    child.href
-                                  }
+                                  type="button"
                                   onClick={() =>
-                                    setMobileMenuOpen(
-                                      false
+                                    handleLearningItemClick(
+                                      child
                                     )
                                   }
                                   className="
                                     flex
+                                    w-full
                                     items-center
                                     gap-3
                                     rounded-xl
                                     px-3
                                     py-2.5
+                                    text-left
                                     transition-colors
                                     hover:bg-[#f2f8ff]
                                   "
@@ -897,7 +908,6 @@ export default function StickyHorizontalNav() {
                                       justify-center
                                       rounded-lg
                                       bg-[#edf6ff]
-                                      text-base
                                     "
                                   >
                                     {
@@ -943,88 +953,75 @@ export default function StickyHorizontalNav() {
                                       text-[#9aabc2]
                                     "
                                   />
-                                </Link>
+                                </button>
                               )
                             )}
                           </div>
-                        </div>
+                        )}
                       </div>
-                    </div>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      key={
+                        item.label
+                      }
+                      href={
+                        item.href
+                      }
+                      onClick={() =>
+                        setMobileMenuOpen(
+                          false
+                        )
+                      }
+                      className="
+                        flex
+                        min-h-[54px]
+                        items-center
+                        gap-3
+                        rounded-xl
+                        px-3
+                        text-[14px]
+                        font-semibold
+                        text-[#1f3158]
+                        hover:bg-[#f4f9ff]
+                      "
+                    >
+                      <span
+                        className="
+                          flex
+                          h-9
+                          w-9
+                          items-center
+                          justify-center
+                          rounded-[10px]
+                          bg-[#f1f7ff]
+                          text-[#164fa5]
+                        "
+                      >
+                        {
+                          item.icon
+                        }
+                      </span>
+
+                      <span>
+                        {
+                          item.label
+                        }
+                      </span>
+                    </Link>
                   );
                 }
-
-                /* ===========================================
-                    NORMAL MOBILE LINK
-                =========================================== */
-                return (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    onClick={() =>
-                      setMobileMenuOpen(false)
-                    }
-                    className={`
-                      flex
-                      min-h-[54px]
-                      items-center
-                      gap-3
-                      rounded-xl
-                      px-3
-                      text-[14px]
-                      font-semibold
-                      transition-all
-
-                      ${
-                        active
-                          ? `
-                              bg-[#edf7ff]
-                              text-[#0755b9]
-                            `
-                          : `
-                              text-[#1f3158]
-                              hover:bg-[#f4f9ff]
-                            `
-                      }
-                    `}
-                  >
-                    <span
-                      className={`
-                        flex
-                        h-9
-                        w-9
-                        items-center
-                        justify-center
-                        rounded-[10px]
-
-                        ${
-                          active
-                            ? `
-                                bg-[#d9efff]
-                                text-[#017cc0]
-                              `
-                            : `
-                                bg-[#f1f7ff]
-                                text-[#164fa5]
-                              `
-                        }
-                      `}
-                    >
-                      {item.icon}
-                    </span>
-
-                    <span>
-                      {item.label}
-                    </span>
-                  </Link>
-                );
-              })}
+              )}
             </div>
 
-            {/* MOBILE LOGIN */}
             <Link
               href="/login"
               onClick={() =>
-                setMobileMenuOpen(false)
+                setMobileMenuOpen(
+                  false
+                )
               }
               className="
                 mt-4
@@ -1041,24 +1038,27 @@ export default function StickyHorizontalNav() {
                 text-[14px]
                 font-semibold
                 text-white
-                shadow-[0_10px_24px_rgba(3,76,196,0.18)]
               "
             >
-              <LogIn size={18} />
+              <LogIn
+                size={18}
+              />
+
               Login
             </Link>
           </nav>
         </div>
       </header>
 
-      {/* =====================================================
-          MOBILE OVERLAY
-      ===================================================== */}
+      {/* MOBILE OVERLAY */}
+
       <button
         type="button"
         aria-label="Close navigation"
         onClick={() =>
-          setMobileMenuOpen(false)
+          setMobileMenuOpen(
+            false
+          )
         }
         className={`
           fixed
@@ -1084,6 +1084,25 @@ export default function StickyHorizontalNav() {
                 `
           }
         `}
+      />
+
+      {/* =====================================================
+          SAME MAIN COURSE MODAL
+      ===================================================== */}
+
+      <MainCoursesModal
+        open={Boolean(
+          selectedLearningItem
+        )}
+        destinationPath={
+          selectedLearningItem?.path ??
+          ""
+        }
+        onClose={() =>
+          setSelectedLearningItem(
+            null
+          )
+        }
       />
     </>
   );

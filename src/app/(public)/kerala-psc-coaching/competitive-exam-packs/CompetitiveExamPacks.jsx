@@ -6,11 +6,19 @@ import {
 
 import CompetitiveExamPackCard from "./CompetitiveExamPackCard";
 
-import {
-  competitiveExamPacks,
-} from "./competitiveExamPacksData";
+import {getPackagesList} from "@/lib/packagesHelper";
 
-export default function CompetitiveExamPacks() {
+export default async function CompetitiveExamPacks() {
+
+  const packages = await getPackagesList({uid:0,cid:1});
+
+  // const visiblePackages = packages.slice(0,2);
+  // if(!visiblePackages.length){
+  //   return null;
+  // }
+
+
+
   return (
     <section
       className="
@@ -85,34 +93,7 @@ export default function CompetitiveExamPacks() {
             />
           </div>
 
-          <Link
-            href="/kerala-psc-coaching/recommended-courses"
-            className="
-              group
-              hidden
-              items-center
-              gap-2
-              text-[11px]
-              font-bold
-              text-[#075ee7]
-              transition-colors
-              hover:text-[#164fa5]
-
-              sm:inline-flex
-            "
-          >
-            View All
-
-            <ArrowRight
-              className="
-                h-4
-                w-4
-                transition-transform
-                duration-300
-                group-hover:translate-x-1
-              "
-            />
-          </Link>
+          
         </div>
 
         {/* Cards */}
@@ -126,7 +107,7 @@ export default function CompetitiveExamPacks() {
             lg:grid-cols-2
           "
         >
-          {competitiveExamPacks.map(
+          {packages.map(
             (item) => (
               <CompetitiveExamPackCard
                 key={item.id}
@@ -136,40 +117,7 @@ export default function CompetitiveExamPacks() {
           )}
         </div>
 
-        {/* Mobile View All */}
-        <div
-          className="
-            mt-4
-            flex
-            justify-center
-
-            sm:hidden
-          "
-        >
-          <Link
-            href="/kerala-psc-coaching/recommended-courses"
-            className="
-              inline-flex
-              items-center
-              gap-2
-              rounded-full
-              border
-              border-[#1976ed]
-              bg-white
-              px-5
-              py-2.5
-              text-[11px]
-              font-bold
-              text-[#164fa5]
-            "
-          >
-            View All
-
-            <ArrowRight
-              className="h-4 w-4"
-            />
-          </Link>
-        </div>
+      
       </div>
     </section>
   );
