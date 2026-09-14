@@ -3,7 +3,7 @@ import {
   } from "next/server";
   
   const API_URL =
-    "http://psc.technocitysolutions.com/public/api/getCurrentAffairMonthsCid";
+    "http://psc.technocitysolutions.com/public/api/getCurrentAffairQuizList";
   
   export async function GET(request) {
     try {
@@ -12,15 +12,11 @@ import {
   
       const cid =
         searchParams.get("cid") ||
-        "1";
+        "60";
   
       const uid =
         searchParams.get("uid") ||
         "21";
-  
-      const offset =
-        searchParams.get("offset") ||
-        "0";
   
       const apiKey =
         process.env.PSC_API_KEY;
@@ -57,11 +53,6 @@ import {
         String(uid)
       );
   
-      formData.append(
-        "offset",
-        String(offset)
-      );
-  
       const response =
         await fetch(API_URL, {
           method: "POST",
@@ -73,7 +64,7 @@ import {
         await response.json();
   
       console.log(
-        "getCurrentAffairMonthsCid result:",
+        "getCurrentAffairQuizList result:",
         result
       );
   
@@ -83,7 +74,7 @@ import {
             status: false,
             message:
               result?.message ||
-              "Unable to fetch months.",
+              "Unable to fetch quizzes.",
             data: [],
           },
           {
@@ -101,7 +92,7 @@ import {
       );
     } catch (error) {
       console.error(
-        "Current Affairs month route error:",
+        "Current Affairs quiz list route error:",
         error
       );
   
@@ -109,7 +100,7 @@ import {
         {
           status: false,
           message:
-            "Failed to load Current Affairs months.",
+            "Failed to load Current Affairs quizzes.",
           data: [],
         },
         {

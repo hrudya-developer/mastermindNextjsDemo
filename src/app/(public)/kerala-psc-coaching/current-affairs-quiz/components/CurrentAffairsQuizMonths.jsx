@@ -16,20 +16,14 @@ export default function CurrentAffairsQuizMonths({
   uid = 21,
   onSelect,
 }) {
-  const [
-    months,
-    setMonths,
-  ] = useState([]);
+  const [months, setMonths] =
+    useState([]);
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] =
+    useState("");
 
   useEffect(() => {
     let active = true;
@@ -41,7 +35,11 @@ export default function CurrentAffairsQuizMonths({
 
         const response =
           await fetch(
-            `/api/current-affairs-quiz/months?cid=${cid}&uid=${uid}&offset=0`,
+            `/api/current-affairs-quiz/months?cid=${encodeURIComponent(
+              cid
+            )}&uid=${encodeURIComponent(
+              uid
+            )}&offset=0`,
             {
               cache: "no-store",
             }
@@ -49,6 +47,11 @@ export default function CurrentAffairsQuizMonths({
 
         const result =
           await response.json();
+
+        console.log(
+          "MONTH API RESULT:",
+          result
+        );
 
         if (!response.ok) {
           throw new Error(
@@ -59,13 +62,46 @@ export default function CurrentAffairsQuizMonths({
 
         if (!active) return;
 
-        setMonths(
+        let monthData = [];
+
+        if (
           Array.isArray(result?.data)
-            ? result.data
-            : []
+        ) {
+          monthData = result.data;
+        } else if (
+          Array.isArray(
+            result?.months
+          )
+        ) {
+          monthData =
+            result.months;
+        } else if (
+          Array.isArray(
+            result?.result
+          )
+        ) {
+          monthData =
+            result.result;
+        } else if (
+          Array.isArray(
+            result?.data?.data
+          )
+        ) {
+          monthData =
+            result.data.data;
+        }
+
+        console.log(
+          "NORMALIZED MONTH DATA:",
+          monthData
         );
+
+        setMonths(monthData);
       } catch (error) {
-        console.error(error);
+        console.error(
+          "Month fetch error:",
+          error
+        );
 
         if (active) {
           setError(
@@ -88,43 +124,63 @@ export default function CurrentAffairsQuizMonths({
 
   if (loading) {
     return (
-      <div
+      <section
         className="
-          flex
-          min-h-[250px]
-          items-center
-          justify-center
+          mt-6
+          rounded-[26px]
+          border
+          border-[#dce8f7]
+          bg-white
+          p-6
         "
       >
-        <LoaderCircle
+        <div
           className="
-            animate-spin
-            text-[#164fa5]
+            flex
+            min-h-[240px]
+            items-center
+            justify-center
           "
-          size={28}
-        />
-      </div>
+        >
+          <LoaderCircle
+            size={28}
+            className="
+              animate-spin
+              text-[#164fa5]
+            "
+          />
+        </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div
+      <section
         className="
-          rounded-[20px]
+          mt-6
+          rounded-[26px]
           border
           border-red-100
-          bg-red-50
-          px-5
-          py-10
-          text-center
-          text-sm
-          font-semibold
-          text-red-500
+          bg-white
+          p-6
         "
       >
-        {error}
-      </div>
+        <div
+          className="
+            rounded-[20px]
+            bg-red-50
+            px-5
+            py-10
+            text-center
+            text-sm
+            font-semibold
+            text-red-500
+          "
+        >
+          {error}
+        </div>
+      </section>
     );
   }
 
@@ -137,6 +193,7 @@ export default function CurrentAffairsQuizMonths({
         border-[#dce8f7]
         bg-white
         p-5
+        shadow-[0_12px_35px_rgba(11,33,108,0.05)]
         sm:p-6
       "
     >
@@ -158,121 +215,203 @@ export default function CurrentAffairsQuizMonths({
             text-slate-500
           "
         >
-          Select a month to view
-          available current affairs
+          Select a month and year to
+          view available Current Affairs
           quizzes.
         </p>
       </div>
 
-      <div
-        className="
-          grid
-          grid-cols-1
-          gap-4
-          sm:grid-cols-2
-          lg:grid-cols-3
-          xl:grid-cols-4
-        "
-      >
-        {months.map((item, index) => {
-          const month =
-            item?.month || "";
+      {months.length > 0 ? (
+        <div
+          className="
+            grid
+            grid-cols-1
+            gap-4
+            sm:grid-cols-2
+            lg:grid-cols-3
+            xl:grid-cols-4
+          "
+        >
+          {months.map(
+            (item, index) => {
+              const month =
+                item?.month ||
+                item?.month_name ||
+                item?.name ||
+                "";
 
-          const year =
-            item?.year || "";
+              const year =
+                item?.year ||
+                item?.year_name ||
+                "";
 
-          return (
-            <button
-              type="button"
-              key={
-                item?.id ||
-                `${month}-${year}-${index}`
-              }
-              onClick={() =>
-                onSelect?.({
-                  ...item,
-                  month,
-                  year,
-                })
-              }
-              className="
-                group
-                flex
-                items-center
-                justify-between
-                rounded-[22px]
-                border
-                border-[#dce8f7]
-                bg-gradient-to-br
-                from-white
-                to-[#f3f8ff]
-                p-5
-                text-left
-                transition-all
-                duration-300
-                hover:-translate-y-1
-                hover:border-[#087bea]/30
-                hover:shadow-[0_15px_35px_rgba(22,79,165,0.10)]
-              "
-            >
-              <div
-                className="
-                  flex
-                  items-center
-                  gap-3
-                "
-              >
-                <div
+              return (
+                <button
+                  type="button"
+                  key={
+                    item?.id ||
+                    `${month}-${year}-${index}`
+                  }
+                  onClick={() =>
+                    onSelect?.({
+                      ...item,
+                      month,
+                      year,
+                    })
+                  }
                   className="
-                    flex
-                    h-11
-                    w-11
-                    items-center
-                    justify-center
-                    rounded-[14px]
-                    bg-[#e8f3ff]
-                    text-[#087bea]
+                    group
+                    relative
+                    overflow-hidden
+                    rounded-[22px]
+                    border
+                    border-[#dce8f7]
+                    bg-gradient-to-br
+                    from-white
+                    to-[#f3f8ff]
+                    p-5
+                    text-left
+                    transition-all
+                    duration-300
+
+                    hover:-translate-y-1
+                    hover:border-[#087bea]/30
+                    hover:shadow-[0_16px_38px_rgba(22,79,165,0.10)]
                   "
                 >
-                  <CalendarDays
-                    size={19}
+                  <div
+                    aria-hidden="true"
+                    className="
+                      absolute
+                      -right-8
+                      -top-8
+                      h-24
+                      w-24
+                      rounded-full
+                      bg-[#087bea]/5
+                    "
                   />
-                </div>
 
-                <div>
-                  <h3
+                  <div
                     className="
-                      font-black
-                      text-[#102c5c]
+                      relative
+                      z-10
+                      flex
+                      items-center
+                      justify-between
+                      gap-4
                     "
                   >
-                    {month}
-                  </h3>
+                    <div
+                      className="
+                        flex
+                        items-center
+                        gap-3
+                      "
+                    >
+                      <div
+                        className="
+                          flex
+                          h-12
+                          w-12
+                          shrink-0
+                          items-center
+                          justify-center
+                          rounded-[15px]
+                          bg-[#e7f2ff]
+                          text-[#087bea]
+                        "
+                      >
+                        <CalendarDays
+                          size={20}
+                        />
+                      </div>
 
-                  <p
-                    className="
-                      mt-0.5
-                      text-xs
-                      text-slate-500
-                    "
-                  >
-                    {year}
-                  </p>
-                </div>
-              </div>
+                      <div>
+                        <h3
+                          className="
+                            text-base
+                            font-black
+                            text-[#102c5c]
+                          "
+                        >
+                          {month ||
+                            "Month"}
+                        </h3>
 
-              <ChevronRight
-                size={18}
-                className="
-                  text-[#164fa5]
-                  transition-transform
-                  group-hover:translate-x-1
-                "
-              />
-            </button>
-          );
-        })}
-      </div>
+                        <p
+                          className="
+                            mt-1
+                            text-xs
+                            font-semibold
+                            text-slate-500
+                          "
+                        >
+                          {year ||
+                            "Current Affairs"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <ChevronRight
+                      size={18}
+                      className="
+                        shrink-0
+                        text-[#164fa5]
+                        transition-transform
+                        duration-300
+                        group-hover:translate-x-1
+                      "
+                    />
+                  </div>
+                </button>
+              );
+            }
+          )}
+        </div>
+      ) : (
+        <div
+          className="
+            rounded-[20px]
+            border
+            border-dashed
+            border-[#cadbef]
+            bg-[#f7fbff]
+            px-5
+            py-12
+            text-center
+          "
+        >
+          <CalendarDays
+            size={28}
+            className="
+              mx-auto
+              text-[#087bea]
+            "
+          />
+
+          <h3
+            className="
+              mt-3
+              font-black
+              text-[#102c5c]
+            "
+          >
+            No months found
+          </h3>
+
+          <p
+            className="
+              mt-1
+              text-xs
+              text-slate-500
+            "
+          >
+            The Current Affairs months
+            API returned no records.
+          </p>
+        </div>
+      )}
     </section>
   );
 }

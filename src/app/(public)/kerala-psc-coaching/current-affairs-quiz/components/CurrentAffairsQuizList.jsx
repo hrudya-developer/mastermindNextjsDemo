@@ -16,21 +16,16 @@ import QuizEmpty from "./QuizEmpty";
 export default function CurrentAffairsQuizList({
   cid = 60,
   uid = 21,
+  selectedMonth,
 }) {
-  const [
-    quizzes,
-    setQuizzes,
-  ] = useState([]);
+  const [quizzes, setQuizzes] =
+    useState([]);
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
+  const [error, setError] =
+    useState("");
 
   useEffect(() => {
     let active = true;
@@ -42,7 +37,7 @@ export default function CurrentAffairsQuizList({
 
         const response =
           await fetch(
-            `/api/current-affairs-quiz?cid=${encodeURIComponent(
+            `/api/current-affairs-quiz/list?cid=${encodeURIComponent(
               cid
             )}&uid=${encodeURIComponent(
               uid
@@ -55,6 +50,11 @@ export default function CurrentAffairsQuizList({
         const result =
           await response.json();
 
+        console.log(
+          "QUIZ API RESULT:",
+          result
+        );
+
         if (!response.ok) {
           throw new Error(
             result?.message ||
@@ -65,13 +65,15 @@ export default function CurrentAffairsQuizList({
         if (!active) return;
 
         setQuizzes(
-          Array.isArray(result?.data)
+          Array.isArray(
+            result?.data
+          )
             ? result.data
             : []
         );
       } catch (error) {
         console.error(
-          "Current affairs quiz error:",
+          "Quiz list error:",
           error
         );
 
@@ -97,18 +99,16 @@ export default function CurrentAffairsQuizList({
   return (
     <section
       className="
-        mt-6
+        mt-5
         rounded-[26px]
         border
         border-[#dce8f7]
         bg-white
-        p-4
+        p-5
         shadow-[0_12px_35px_rgba(11,33,108,0.05)]
         sm:p-6
       "
     >
-      {/* Header */}
-
       <div
         className="
           mb-6
@@ -142,7 +142,8 @@ export default function CurrentAffairsQuizList({
               text-[#102c5c]
             "
           >
-            Current Affairs Quizzes
+            {selectedMonth?.month}{" "}
+            {selectedMonth?.year} Quizzes
           </h2>
 
           <p
@@ -157,8 +158,6 @@ export default function CurrentAffairsQuizList({
           </p>
         </div>
       </div>
-
-      {/* Loading */}
 
       {loading && (
         <div
@@ -176,7 +175,7 @@ export default function CurrentAffairsQuizList({
             <div
               key={index}
               className="
-                min-h-[190px]
+                min-h-[200px]
                 animate-pulse
                 rounded-[22px]
                 bg-slate-100
@@ -186,29 +185,24 @@ export default function CurrentAffairsQuizList({
         </div>
       )}
 
-      {/* Error */}
-
-      {!loading &&
-        error && (
-          <div
-            className="
-              rounded-[18px]
-              border
-              border-red-100
-              bg-red-50
-              px-5
-              py-10
-              text-center
-              text-sm
-              font-semibold
-              text-red-500
-            "
-          >
-            {error}
-          </div>
-        )}
-
-      {/* Results */}
+      {!loading && error && (
+        <div
+          className="
+            rounded-[20px]
+            border
+            border-red-100
+            bg-red-50
+            px-5
+            py-10
+            text-center
+            text-sm
+            font-semibold
+            text-red-500
+          "
+        >
+          {error}
+        </div>
+      )}
 
       {!loading &&
         !error &&
