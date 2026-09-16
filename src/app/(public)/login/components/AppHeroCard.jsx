@@ -184,7 +184,6 @@ export default function AppHeroCard() {
             alt="Mastermind PSC mobile learning application"
             width={620}
             height={1100}
-            priority
             sizes="
               (max-width: 768px) 55vw,
               (max-width: 1280px) 32vw,

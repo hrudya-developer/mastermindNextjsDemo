@@ -27,7 +27,7 @@ export default function SidebarItem({
         transition-all
         duration-300
         hover:-translate-y-0.5
-        hover:shadow-md
+        hover:shadow-md cursor-pointer
       "
     >
       <div

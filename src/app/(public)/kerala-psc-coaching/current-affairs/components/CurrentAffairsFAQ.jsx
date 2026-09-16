@@ -195,7 +195,7 @@ export default function CurrentAffairsFAQ() {
                     px-4
                     py-4
                     text-left
-                    sm:px-5
+                    sm:px-5 cursor-pointer
                   "
                 >
                   <span

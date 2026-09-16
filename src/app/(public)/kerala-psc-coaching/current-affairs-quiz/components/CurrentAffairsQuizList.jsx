@@ -10,24 +10,45 @@ import {
   LoaderCircle,
 } from "lucide-react";
 
-import CurrentAffairsQuizCard from "./CurrentAffairsQuizCard";
-import QuizEmpty from "./QuizEmpty";
+import CurrentAffairsQuizTabs from "./CurrentAffairsQuizTabs";
+import CurrentAffairsQuizQuestions from "./CurrentAffairsQuizQuestions";
 
 export default function CurrentAffairsQuizList({
-  cid = 60,
-  uid = 21,
   selectedMonth,
+  uid = 21,
 }) {
-  const [quizzes, setQuizzes] =
-    useState([]);
+  const [
+    quizzes,
+    setQuizzes,
+  ] = useState([]);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [
+    selectedQuiz,
+    setSelectedQuiz,
+  ] = useState(null);
 
-  const [error, setError] =
-    useState("");
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
+
+  const [
+    error,
+    setError,
+  ] = useState("");
+
+  const quizListCid =
+    selectedMonth?.quizListCid;
 
   useEffect(() => {
+    if (!quizListCid) {
+      setQuizzes([]);
+      setSelectedQuiz(null);
+      setLoading(false);
+
+      return;
+    }
+
     let active = true;
 
     async function loadQuizzes() {
@@ -35,15 +56,20 @@ export default function CurrentAffairsQuizList({
         setLoading(true);
         setError("");
 
+        setSelectedQuiz(
+          null
+        );
+
         const response =
           await fetch(
             `/api/current-affairs-quiz/list?cid=${encodeURIComponent(
-              cid
+              quizListCid
             )}&uid=${encodeURIComponent(
               uid
             )}`,
             {
-              cache: "no-store",
+              cache:
+                "no-store",
             }
           );
 
@@ -51,7 +77,7 @@ export default function CurrentAffairsQuizList({
           await response.json();
 
         console.log(
-          "QUIZ API RESULT:",
+          "MONTH QUIZ LIST:",
           result
         );
 
@@ -62,14 +88,29 @@ export default function CurrentAffairsQuizList({
           );
         }
 
-        if (!active) return;
+        if (!active) {
+          return;
+        }
 
-        setQuizzes(
+        const quizData =
           Array.isArray(
             result?.data
           )
             ? result.data
-            : []
+            : [];
+
+        setQuizzes(
+          quizData
+        );
+
+        /*
+          Automatically open
+          Quiz 1.
+        */
+
+        setSelectedQuiz(
+          quizData[0] ||
+            null
         );
       } catch (error) {
         console.error(
@@ -78,8 +119,14 @@ export default function CurrentAffairsQuizList({
         );
 
         if (active) {
+          setQuizzes([]);
+
+          setSelectedQuiz(
+            null
+          );
+
           setError(
-            "Unable to load current affairs quizzes."
+            "Unable to load quizzes for this month."
           );
         }
       } finally {
@@ -94,13 +141,16 @@ export default function CurrentAffairsQuizList({
     return () => {
       active = false;
     };
-  }, [cid, uid]);
+  }, [
+    quizListCid,
+    uid,
+  ]);
 
   return (
     <section
       className="
         mt-5
-        rounded-[26px]
+        rounded-[28px]
         border
         border-[#dce8f7]
         bg-white
@@ -113,121 +163,178 @@ export default function CurrentAffairsQuizList({
         className="
           mb-6
           flex
+          flex-wrap
           items-center
-          gap-3
+          justify-between
+          gap-4
         "
       >
         <div
           className="
             flex
-            h-11
-            w-11
             items-center
-            justify-center
-            rounded-[14px]
-            bg-gradient-to-br
-            from-[#087bea]
-            to-[#164fa5]
-            text-white
+            gap-3
           "
         >
-          <Brain size={19} />
-        </div>
-
-        <div>
-          <h2
+          <div
             className="
-              text-xl
-              font-black
-              text-[#102c5c]
+              flex
+              h-11
+              w-11
+              items-center
+              justify-center
+              rounded-[14px]
+              bg-gradient-to-br
+              from-[#087bea]
+              to-[#164fa5]
+              text-white
             "
           >
-            {selectedMonth?.month}{" "}
-            {selectedMonth?.year} Quizzes
-          </h2>
+            <Brain
+              size={19}
+            />
+          </div>
 
-          <p
-            className="
-              mt-0.5
-              text-[11px]
-              text-slate-500
-            "
-          >
-            Choose a quiz and start
-            practicing.
-          </p>
+          <div>
+            <p
+              className="
+                text-[10px]
+                font-black
+                uppercase
+                tracking-[0.15em]
+                text-[#087bea]
+              "
+            >
+              Quiz Practice
+            </p>
+
+            <h2
+              className="
+                text-xl
+                font-black
+                text-[#102c5c]
+              "
+            >
+              {
+                selectedMonth?.month
+              }{" "}
+              {
+                selectedMonth?.year
+              }
+            </h2>
+          </div>
         </div>
+
+        {!loading &&
+          !error &&
+          quizzes.length >
+            0 && (
+            <span
+              className="
+                rounded-full
+                bg-[#eef6ff]
+                px-4
+                py-2
+                text-[11px]
+                font-black
+                text-[#164fa5]
+              "
+            >
+              {
+                quizzes.length
+              }{" "}
+              {quizzes.length ===
+              1
+                ? "Quiz"
+                : "Quizzes"}
+            </span>
+          )}
       </div>
 
       {loading && (
         <div
           className="
-            grid
-            grid-cols-1
-            gap-4
-            sm:grid-cols-2
-            lg:grid-cols-3
+            flex
+            min-h-[180px]
+            items-center
+            justify-center
           "
         >
-          {Array.from({
-            length: 6,
-          }).map((_, index) => (
-            <div
-              key={index}
-              className="
-                min-h-[200px]
-                animate-pulse
-                rounded-[22px]
-                bg-slate-100
-              "
-            />
-          ))}
-        </div>
-      )}
-
-      {!loading && error && (
-        <div
-          className="
-            rounded-[20px]
-            border
-            border-red-100
-            bg-red-50
-            px-5
-            py-10
-            text-center
-            text-sm
-            font-semibold
-            text-red-500
-          "
-        >
-          {error}
+          <LoaderCircle
+            size={27}
+            className="
+              animate-spin
+              text-[#087bea]
+            "
+          />
         </div>
       )}
 
       {!loading &&
-        !error &&
-        (quizzes.length > 0 ? (
+        error && (
           <div
             className="
-              grid
-              grid-cols-1
-              gap-4
-              sm:grid-cols-2
-              lg:grid-cols-3
+              rounded-[20px]
+              border
+              border-red-100
+              bg-red-50
+              p-8
+              text-center
+              text-sm
+              font-semibold
+              text-red-500
             "
           >
-            {quizzes.map(
-              (quiz) => (
-                <CurrentAffairsQuizCard
-                  key={quiz?.id}
-                  quiz={quiz}
-                />
-              )
-            )}
+            {error}
           </div>
-        ) : (
-          <QuizEmpty />
-        ))}
+        )}
+
+      {!loading &&
+        !error &&
+        quizzes.length ===
+          0 && (
+          <div
+            className="
+              rounded-[20px]
+              bg-slate-50
+              p-10
+              text-center
+              text-sm
+              font-semibold
+              text-slate-500
+            "
+          >
+            No quizzes
+            available for this
+            month.
+          </div>
+        )}
+
+      {!loading &&
+        !error &&
+        quizzes.length >
+          0 && (
+          <>
+            <CurrentAffairsQuizTabs
+              quizzes={
+                quizzes
+              }
+              selectedQuiz={
+                selectedQuiz
+              }
+              onSelect={
+                setSelectedQuiz
+              }
+            />
+
+            <CurrentAffairsQuizQuestions
+              quiz={
+                selectedQuiz
+              }
+              uid={uid}
+            />
+          </>
+        )}
     </section>
   );
 }

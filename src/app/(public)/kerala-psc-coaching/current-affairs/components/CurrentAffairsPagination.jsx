@@ -46,7 +46,7 @@ import {
             hover:border-[#087bea]/30
             hover:bg-[#f4f9ff]
             disabled:cursor-not-allowed
-            disabled:opacity-40
+            disabled:opacity-40 cursor-pointer
           "
         >
           <ChevronLeft
@@ -92,7 +92,7 @@ import {
             transition
             hover:bg-[#0566c7]
             disabled:cursor-not-allowed
-            disabled:opacity-40
+            disabled:opacity-40 cursor-pointer
           "
         >
           Next

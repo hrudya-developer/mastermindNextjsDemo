@@ -28,7 +28,8 @@ import {
 import MainCoursesModal from "@/components/main-course-modal/MainCoursesModal";
 
 export default function StickyHorizontalNav() {
-  const pathname = usePathname();
+  const pathname =
+    usePathname();
 
   const [
     mobileMenuOpen,
@@ -60,7 +61,9 @@ export default function StickyHorizontalNav() {
 
   useEffect(() => {
     if (!mobileMenuOpen) {
-      document.body.style.overflow = "";
+      document.body.style.overflow =
+        "";
+
       return;
     }
 
@@ -68,7 +71,8 @@ export default function StickyHorizontalNav() {
       "hidden";
 
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow =
+        "";
     };
   }, [mobileMenuOpen]);
 
@@ -76,12 +80,16 @@ export default function StickyHorizontalNav() {
       ACTIVE LINK
   ===================================================== */
 
-  const isActiveLink = (href) => {
+  const isActiveLink = (
+    href
+  ) => {
     if (!href) {
       return false;
     }
 
-    if (href.startsWith("#")) {
+    if (
+      href.startsWith("#")
+    ) {
       return false;
     }
 
@@ -89,29 +97,30 @@ export default function StickyHorizontalNav() {
       return pathname === "/";
     }
 
-    return pathname.startsWith(href);
+    return pathname.startsWith(
+      href
+    );
   };
 
   /* =====================================================
       LEARNING HUB ACTIVE
   ===================================================== */
 
-  const isLearningHubActive = (
-    item
-  ) =>
-    item.children?.some(
-      (child) => {
-        if (!child?.path) {
-          return false;
-        }
+  const isLearningHubActive =
+    (item) =>
+      item.children?.some(
+        (child) => {
+          if (
+            !child?.path
+          ) {
+            return false;
+          }
 
-        return (
-          pathname.includes(
+          return pathname.includes(
             `/${child.path}`
-          )
-        );
-      }
-    );
+          );
+        }
+      );
 
   /* =====================================================
       OPEN LEARNING HUB MODAL
@@ -173,6 +182,7 @@ export default function StickyHorizontalNav() {
             className="
               flex
               min-w-[230px]
+              cursor-pointer
               shrink-0
               items-center
               xl:min-w-[250px]
@@ -253,6 +263,7 @@ export default function StickyHorizontalNav() {
                             group
                             flex
                             min-w-[92px]
+                            cursor-pointer
                             flex-col
                             items-center
                             justify-center
@@ -339,6 +350,8 @@ export default function StickyHorizontalNav() {
                             group-hover/dropdown:opacity-100
                           "
                         >
+                          {/* HOVER BRIDGE */}
+
                           <div
                             className="
                               absolute
@@ -449,6 +462,7 @@ export default function StickyHorizontalNav() {
                                       group/item
                                       flex
                                       w-full
+                                      cursor-pointer
                                       items-center
                                       gap-3
                                       rounded-[14px]
@@ -547,6 +561,7 @@ export default function StickyHorizontalNav() {
                         group
                         flex
                         min-w-[72px]
+                        cursor-pointer
                         flex-col
                         items-center
                         justify-center
@@ -628,6 +643,7 @@ export default function StickyHorizontalNav() {
                 flex
                 min-h-[52px]
                 min-w-[135px]
+                cursor-pointer
                 items-center
                 justify-center
                 gap-2
@@ -693,6 +709,9 @@ export default function StickyHorizontalNav() {
                 false
               )
             }
+            className="
+              cursor-pointer
+            "
           >
             <Image
               src="/assets/logo-256.png"
@@ -723,6 +742,7 @@ export default function StickyHorizontalNav() {
               flex
               h-11
               w-11
+              cursor-pointer
               items-center
               justify-center
               rounded-[13px]
@@ -780,7 +800,13 @@ export default function StickyHorizontalNav() {
               pt-3
             "
           >
-            <div className="flex flex-col gap-1">
+            <div
+              className="
+                flex
+                flex-col
+                gap-1
+              "
+            >
               {leftMenu.map(
                 (item) => {
                   const hasChildren =
@@ -811,6 +837,7 @@ export default function StickyHorizontalNav() {
                             flex
                             min-h-[54px]
                             w-full
+                            cursor-pointer
                             items-center
                             gap-3
                             rounded-xl
@@ -838,7 +865,11 @@ export default function StickyHorizontalNav() {
                             }
                           </span>
 
-                          <span className="flex-1">
+                          <span
+                            className="
+                              flex-1
+                            "
+                          >
                             {
                               item.label
                             }
@@ -888,6 +919,7 @@ export default function StickyHorizontalNav() {
                                   className="
                                     flex
                                     w-full
+                                    cursor-pointer
                                     items-center
                                     gap-3
                                     rounded-xl
@@ -978,6 +1010,7 @@ export default function StickyHorizontalNav() {
                       className="
                         flex
                         min-h-[54px]
+                        cursor-pointer
                         items-center
                         gap-3
                         rounded-xl
@@ -1027,6 +1060,7 @@ export default function StickyHorizontalNav() {
                 mt-4
                 flex
                 min-h-[52px]
+                cursor-pointer
                 items-center
                 justify-center
                 gap-2
@@ -1050,7 +1084,9 @@ export default function StickyHorizontalNav() {
         </div>
       </header>
 
-      {/* MOBILE OVERLAY */}
+      {/* =====================================================
+          MOBILE OVERLAY
+      ===================================================== */}
 
       <button
         type="button"
@@ -1064,6 +1100,7 @@ export default function StickyHorizontalNav() {
           fixed
           inset-0
           z-[9997]
+          cursor-pointer
           bg-[#06194b]/20
           backdrop-blur-[2px]
           transition-opacity
@@ -1087,7 +1124,7 @@ export default function StickyHorizontalNav() {
       />
 
       {/* =====================================================
-          SAME MAIN COURSE MODAL
+          MAIN COURSE MODAL
       ===================================================== */}
 
       <MainCoursesModal
