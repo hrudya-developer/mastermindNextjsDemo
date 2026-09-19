@@ -16,7 +16,7 @@ import {
     {
       title: "Current Affairs",
       subtitle: "Daily updates",
-      href: "/current-affairs",
+      href: "/kerala-psc-coaching/current-affairs",
       icon: Newspaper,
       iconColor: "text-[#ec2384]",
       iconBg: "bg-[#ffe1f1]",
@@ -24,7 +24,7 @@ import {
     {
       title: "Mock Tests",
       subtitle: "Practice now",
-      href: "/mock-tests",
+      href: "/kerala-psc-coaching/mock-tests",
       icon: ClipboardCheck,
       iconColor: "text-[#087bea]",
       iconBg: "bg-[#dcefff]",
@@ -32,7 +32,7 @@ import {
     {
       title: "Previous Questions",
       subtitle: "Question bank",
-      href: "/previous-questions",
+      href: "/kerala-psc-coaching/previous-questions",
       icon: NotepadText,
       iconColor: "text-[#0dac77]",
       iconBg: "bg-[#d9f7eb]",
@@ -40,7 +40,7 @@ import {
     {
       title: "Exam Syllabus",
       subtitle: "Detailed syllabus",
-      href: "/exam-syllabus",
+      href: "/kerala-psc-coaching/exam-syllabus",
       icon: BookOpen,
       iconColor: "text-[#6131e8]",
       iconBg: "bg-[#ebe4ff]",
@@ -48,7 +48,7 @@ import {
     {
       title: "SCERT Tests",
       subtitle: "Textbook based",
-      href: "/scert-tests",
+      href: "/kerala-psc-coaching/scert-tests",
       icon: LibraryBig,
       iconColor: "text-[#f26522]",
       iconBg: "bg-[#fff0df]",
@@ -56,7 +56,7 @@ import {
     {
       title: "PSC Alerts",
       subtitle: "Notifications",
-      href: "/psc-alerts",
+      href: "/kerala-psc-coaching/psc-notifications",
       icon: Bell,
       iconColor: "text-[#1688ed]",
       iconBg: "bg-[#dff1ff]",
@@ -64,7 +64,7 @@ import {
     {
       title: "PSC Bulletin",
       subtitle: "Official updates",
-      href: "/psc-bulletin-ca",
+      href: "/kerala-psc-coaching/psc-bulletin-ca",
       icon: Megaphone,
       iconColor: "text-[#ef2786]",
       iconBg: "bg-[#ffe2f1]",
@@ -72,7 +72,7 @@ import {
     {
       title: "Topic / Subtopic Exams",
       subtitle: "Practice topic-wise",
-      href: "/topic-exams",
+      href: "/kerala-psc-coaching/topic-wise-exams",
       icon: Target,
       iconColor: "text-[#f3195d]",
       iconBg: "bg-[#ffe3eb]",
@@ -80,7 +80,7 @@ import {
     {
       title: "Topicwise Statement Type",
       subtitle: "Subject wise",
-      href: "/statement-type",
+      href: "/kerala-psc-coaching/statement-type-exams",
       icon: NotepadText,
       iconColor: "text-[#5933eb]",
       iconBg: "bg-[#e9e4ff]",
@@ -88,7 +88,7 @@ import {
     {
       title: "PDF",
       subtitle: "Study materials",
-      href: "/pdf",
+      href: "/kerala-psc-coaching/study-materials",
       icon: FileText,
       iconColor: "text-[#ed245b]",
       iconBg: "bg-[#ffe2ea]",
@@ -96,7 +96,7 @@ import {
     {
       title: "Monthly Quiz",
       subtitle: "Test your knowledge",
-      href: "/monthly-quiz",
+      href: "/kerala-psc-coaching/current-affairs-quiz",
       icon: Trophy,
       iconColor: "text-[#f4a000]",
       iconBg: "bg-[#fff0d7]",
@@ -104,7 +104,7 @@ import {
     {
       title: "AI Videos",
       subtitle: "Learn with AI",
-      href: "/ai-videos",
+      href: "/kerala-psc-coaching/ai-videos",
       icon: Bot,
       iconColor: "text-[#147be8]",
       iconBg: "bg-[#dcefff]",

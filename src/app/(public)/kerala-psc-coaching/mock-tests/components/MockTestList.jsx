@@ -8,17 +8,15 @@ import {
 import {
   ChevronLeft,
   ChevronRight,
-  LoaderCircle,
 } from "lucide-react";
 
 import MockTestCard from "./MockTestCard";
-import MockTestEmpty from "./MockTestEmpty";
 
 const PAGE_SIZE = 10;
 
 export default function MockTestList({
   cid = 1,
-  uid = 21,
+  uid = 0,
   filter = 0,
 }) {
   const [tests, setTests] =
@@ -31,11 +29,6 @@ export default function MockTestList({
     useState("");
 
   const [
-    currentPage,
-    setCurrentPage,
-  ] = useState(1);
-
-  const [
     currentOffset,
     setCurrentOffset,
   ] = useState(0);
@@ -46,366 +39,374 @@ export default function MockTestList({
   ] = useState(null);
 
   const [
-    pageOffsets,
-    setPageOffsets,
-  ] = useState([0]);
+    highestPage,
+    setHighestPage,
+  ] = useState(1);
 
-  useEffect(() => {
-    /*
-     * Reset pagination when
-     * filter changes.
-     */
-    setCurrentPage(1);
-    setCurrentOffset(0);
-    setPageOffsets([0]);
-    setNextOffset(null);
-  }, [filter]);
+  /* =========================================================
+     CURRENT PAGE
+  ========================================================= */
 
-  useEffect(() => {
-    const controller =
-      new AbortController();
+  const currentPage =
+    Math.floor(
+      currentOffset /
+        PAGE_SIZE
+    ) + 1;
 
-    async function fetchMockTests() {
-      try {
-        setLoading(true);
-        setError("");
+  /* =========================================================
+     LOAD MOCK TESTS
+  ========================================================= */
 
-        const response =
-          await fetch(
-            `/api/mock-tests/list?cid=${encodeURIComponent(
-              cid
-            )}&uid=${encodeURIComponent(
-              uid
-            )}&offset=${encodeURIComponent(
-              currentOffset
-            )}&filter=${encodeURIComponent(
-              filter
-            )}`,
-            {
-              cache: "no-store",
-              signal:
-                controller.signal,
-            }
-          );
+  async function loadTests(
+    offset = 0
+  ) {
+    try {
+      setLoading(true);
+      setError("");
 
-        const result =
-          await response.json();
+      const params =
+        new URLSearchParams({
+          cid: String(cid),
+          uid: String(uid),
+          offset:
+            String(offset),
+          filter:
+            String(filter),
+        });
 
-        if (!response.ok) {
-          throw new Error(
-            result?.message ||
-              "Failed to load mock tests."
-          );
-        }
-
-        const mockTests =
-          Array.isArray(
-            result?.data
-          )
-            ? result.data
-            : [];
-
-        setTests(
-          mockTests
+      const response =
+        await fetch(
+          `/api/mock-tests/list?${params.toString()}`,
+          {
+            cache:
+              "no-store",
+          }
         );
 
-        /*
-         * API response example:
-         *
-         * nextoffset: 10
-         */
-        const apiNextOffset =
-          result?.nextoffset;
+      const result =
+        await response.json();
 
-        if (
-          apiNextOffset ===
-            null ||
-          apiNextOffset ===
-            undefined ||
-          mockTests.length === 0
-        ) {
-          setNextOffset(null);
-        } else {
-          setNextOffset(
-            Number(
-              apiNextOffset
-            )
-          );
-        }
-      } catch (error) {
-        if (
-          error?.name ===
-          "AbortError"
-        ) {
-          return;
-        }
-
-        console.error(
-          "Mock tests error:",
-          error
-        );
-
-        setError(
-          error?.message ||
+      if (!response.ok) {
+        throw new Error(
+          result?.message ||
             "Unable to load mock tests."
         );
-      } finally {
-        if (
-          !controller.signal
-            .aborted
-        ) {
-          setLoading(false);
-        }
       }
+
+      const testData =
+        Array.isArray(
+          result?.data
+        )
+          ? result.data
+          : [];
+
+      const apiNextOffset =
+        result?.nextoffset ??
+        result?.nextOffset ??
+        null;
+
+      setTests(
+        testData
+      );
+
+      setCurrentOffset(
+        offset
+      );
+
+      setNextOffset(
+        apiNextOffset
+      );
+
+      const loadedPage =
+        Math.floor(
+          offset /
+            PAGE_SIZE
+        ) + 1;
+
+      /*
+       * If API says another page
+       * exists, expose that page
+       * number too.
+       */
+
+      const discoveredPage =
+        apiNextOffset != null
+          ? loadedPage + 1
+          : loadedPage;
+
+      setHighestPage(
+        (previous) =>
+          Math.max(
+            previous,
+            discoveredPage
+          )
+      );
+    } catch (error) {
+      console.error(
+        "Mock test list:",
+        error
+      );
+
+      setTests([]);
+
+      setNextOffset(
+        null
+      );
+
+      setError(
+        error?.message ||
+          "Unable to load mock tests."
+      );
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchMockTests();
+  /* =========================================================
+     INITIAL LOAD
+  ========================================================= */
 
-    return () => {
-      controller.abort();
-    };
+  useEffect(() => {
+    setCurrentOffset(0);
+
+    setNextOffset(null);
+
+    setHighestPage(1);
+
+    loadTests(0);
   }, [
     cid,
     uid,
     filter,
-    currentOffset,
   ]);
 
-  function handleNext() {
+  /* =========================================================
+     PAGE CLICK
+  ========================================================= */
+
+  async function handlePageClick(
+    page
+  ) {
     if (
-      nextOffset === null
+      loading ||
+      page < 1 ||
+      page === currentPage
     ) {
       return;
     }
 
-    const nextPage =
-      currentPage + 1;
+    const offset =
+      (page - 1) *
+      PAGE_SIZE;
 
-    setPageOffsets(
-      (previous) => {
-        if (
-          previous[
-            nextPage - 1
-          ] !== undefined
-        ) {
-          return previous;
-        }
-
-        return [
-          ...previous,
-          nextOffset,
-        ];
-      }
-    );
-
-    setCurrentPage(
-      nextPage
-    );
-
-    setCurrentOffset(
-      nextOffset
+    await loadTests(
+      offset
     );
 
     scrollToList();
   }
 
-  function handlePrevious() {
+  /* =========================================================
+     PREVIOUS
+  ========================================================= */
+
+  async function handlePrevious() {
     if (
-      currentPage <= 1
+      currentPage <= 1 ||
+      loading
     ) {
       return;
     }
 
-    const previousPage =
-      currentPage - 1;
-
-    const previousOffset =
-      pageOffsets[
-        previousPage - 1
-      ];
-
-    setCurrentPage(
-      previousPage
+    await handlePageClick(
+      currentPage - 1
     );
+  }
 
-    setCurrentOffset(
-      previousOffset
+  /* =========================================================
+     NEXT
+  ========================================================= */
+
+  async function handleNext() {
+    if (
+      nextOffset == null ||
+      loading
+    ) {
+      return;
+    }
+
+    await loadTests(
+      Number(nextOffset)
     );
 
     scrollToList();
   }
+
+  /* =========================================================
+     SCROLL
+  ========================================================= */
 
   function scrollToList() {
-    requestAnimationFrame(
-      () => {
-        document
-          .getElementById(
-            "mock-test-list"
-          )
-          ?.scrollIntoView({
-            behavior:
-              "smooth",
-            block: "start",
-          });
-      }
-    );
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 
-  if (loading) {
+  /* =========================================================
+     PAGE NUMBERS
+  ========================================================= */
+
+  const pageNumbers =
+    Array.from(
+      {
+        length:
+          highestPage,
+      },
+      (_, index) =>
+        index + 1
+    );
+
+  /* =========================================================
+     LOADING
+  ========================================================= */
+
+  if (
+    loading &&
+    tests.length === 0
+  ) {
     return (
       <div
         className="
-          mt-6
-          flex
-          min-h-[260px]
-          items-center
-          justify-center
-          rounded-[24px]
-          border
-          border-[#dce8f7]
-          bg-gradient-to-br
-          from-[#f7f4ff]
-          via-white
-          to-[#eef6ff]
+          grid
+          gap-5
+          md:grid-cols-2
+          xl:grid-cols-3
         "
       >
-        <LoaderCircle
-          size={30}
-          className="
-            animate-spin
-            text-[#3154ee]
-          "
-        />
+        {Array.from({
+          length: 6,
+        }).map(
+          (_, index) => (
+            <div
+              key={
+                index
+              }
+              className="
+                h-[260px]
+                animate-pulse
+                rounded-[24px]
+                border
+                border-slate-200
+                bg-white
+              "
+            />
+          )
+        )}
       </div>
     );
   }
+
+  /* =========================================================
+     ERROR
+  ========================================================= */
 
   if (error) {
     return (
       <div
         className="
-          mt-5
           rounded-[20px]
           border
-          border-red-100
-          bg-red-50
+          border-rose-200
+          bg-rose-50
           px-5
-          py-10
+          py-8
           text-center
-          text-sm
-          font-semibold
-          text-red-500
         "
       >
-        {error}
-      </div>
-    );
-  }
-
-  if (
-    tests.length === 0 &&
-    currentPage === 1
-  ) {
-    return (
-      <MockTestEmpty />
-    );
-  }
-
-  return (
-    <section
-      id="mock-test-list"
-      className="
-        mt-6
-        scroll-mt-24
-      "
-    >
-      {/* HEADER */}
-
-      <div
-        className="
-          mb-5
-          flex
-          flex-col
-          gap-3
-          sm:flex-row
-          sm:items-end
-          sm:justify-between
-        "
-      >
-        <div>
-          <p
-            className="
-              text-[10px]
-              font-black
-              uppercase
-              tracking-[0.15em]
-              text-[#3154ee]
-            "
-          >
-            Practice Tests
-          </p>
-
-          <h2
-            className="
-              mt-1
-              text-xl
-              font-black
-              text-[#28153c]
-              sm:text-2xl
-            "
-          >
-            Available Mock Tests
-          </h2>
-
-          <p
-            className="
-              mt-1
-              text-[11px]
-              text-slate-500
-            "
-          >
-            Page {currentPage}
-          </p>
-        </div>
-
-        <div
+        <p
           className="
-            inline-flex
-            w-fit
-            items-center
-            gap-2
-            rounded-full
-            border
-            border-[#dce8f7]
-            bg-white
-            px-4
-            py-2
-            text-[10px]
-            font-black
-            text-[#3154ee]
-            shadow-sm
+            text-[13px]
+            font-bold
+            text-rose-600
           "
         >
-          {tests.length} tests
-        </div>
+          {error}
+        </p>
       </div>
+    );
+  }
 
+  /* =========================================================
+     EMPTY
+  ========================================================= */
+
+  if (
+    tests.length === 0
+  ) {
+    return (
+      <div
+        className="
+          rounded-[20px]
+          border
+          border-slate-200
+          bg-white
+          px-5
+          py-12
+          text-center
+        "
+      >
+        <p
+          className="
+            text-[13px]
+            font-bold
+            text-slate-500
+          "
+        >
+          No mock tests
+          available.
+        </p>
+      </div>
+    );
+  }
+
+  /* =========================================================
+     UI
+  ========================================================= */
+
+  return (
+    <section>
       {/* CARDS */}
 
       <div
-        className="
+        className={`
           grid
-          grid-cols-1
-          gap-4
+          gap-5
           md:grid-cols-2
           xl:grid-cols-3
-        "
+
+          ${
+            loading
+              ? "pointer-events-none opacity-60"
+              : ""
+          }
+        `}
       >
         {tests.map(
           (test) => (
             <MockTestCard
-              key={test?.id}
-              test={test}
+              key={
+                test?.id
+              }
+              test={
+                test
+              }
+              uid={
+                uid
+              }
+              cid={
+                cid
+              }
             />
           )
         )}
@@ -415,62 +416,58 @@ export default function MockTestList({
 
       <div
         className="
-          mt-8
+          mt-9
           flex
-          flex-col
+          flex-wrap
           items-center
-          justify-between
-          gap-4
-          rounded-[22px]
-          border
-          border-[#dce8f7]
-          bg-gradient-to-r
-          from-[#faf7ff]
-          via-white
-          to-[#eef6ff]
-          p-4
-          shadow-[0_10px_30px_rgba(49,84,238,0.06)]
-          sm:flex-row
+          justify-center
+          gap-2
         "
       >
+        {/* PREVIOUS */}
+
         <button
           type="button"
           onClick={
             handlePrevious
           }
           disabled={
-            currentPage === 1
+            currentPage ===
+              1 ||
+            loading
           }
           className="
             inline-flex
-            min-h-[42px]
-            cursor-pointer
+            h-10
             items-center
             justify-center
-            gap-2
-            rounded-full
+            gap-1.5
+            rounded-[11px]
             border
-            border-[#dce8f7]
+            border-slate-200
             bg-white
-            px-5
-            py-2.5
-            text-[10px]
-            font-black
-            text-[#3154ee]
+            px-4
+            text-[11px]
+            font-bold
+            text-slate-600
             shadow-sm
             transition-all
-            hover:border-[#3154ee]/30
-            hover:bg-[#f5f7ff]
+            duration-200
+            hover:border-blue-200
+            hover:bg-blue-50
+            hover:text-[#164fa5]
             disabled:cursor-not-allowed
             disabled:opacity-40
           "
         >
           <ChevronLeft
-            size={15}
+            size={14}
           />
 
           Previous
         </button>
+
+        {/* PAGE NUMBERS */}
 
         <div
           className="
@@ -479,61 +476,59 @@ export default function MockTestList({
             gap-2
           "
         >
-          {pageOffsets.map(
-            (
-              offset,
-              index
-            ) => {
-              const page =
-                index + 1;
-
-              const active =
+          {pageNumbers.map(
+            (page) => {
+              const isActive =
                 page ===
                 currentPage;
 
               return (
                 <button
                   key={
-                    `${page}-${offset}`
+                    page
                   }
                   type="button"
-                  onClick={() => {
-                    setCurrentPage(
+                  onClick={() =>
+                    handlePageClick(
                       page
-                    );
-
-                    setCurrentOffset(
-                      offset
-                    );
-
-                    scrollToList();
-                  }}
+                    )
+                  }
+                  disabled={
+                    loading
+                  }
+                  aria-current={
+                    isActive
+                      ? "page"
+                      : undefined
+                  }
                   className={`
                     flex
                     h-10
-                    min-w-10
-                    cursor-pointer
+                    w-10
                     items-center
                     justify-center
-                    rounded-full
-                    px-3
-                    text-[10px]
-                    font-black
+                    rounded-[11px]
+                    border
+                    text-[11px]
+                    font-extrabold
                     transition-all
+                    duration-200
 
                     ${
-                      active
+                      isActive
                         ? `
-                            bg-violetBlue text-white
-                            shadow-[0_8px_22px_rgba(49,84,238,0.24)]
+                            border-[#164fa5]
+                            bg-[#164fa5]
+                            text-white
+                            shadow-[0_8px_20px_rgba(22,79,165,0.22)]
                           `
                         : `
-                            border
-                            border-[#dce8f7]
+                            border-slate-200
                             bg-white
-                            text-[#3154ee]
-                            hover:border-[#3154ee]/30
-                            hover:bg-[#f5f7ff]
+                            text-slate-600
+                            hover:border-blue-200
+                            hover:bg-blue-50
+                            hover:text-[#164fa5]
                           `
                     }
                   `}
@@ -545,32 +540,37 @@ export default function MockTestList({
           )}
         </div>
 
+        {/* NEXT */}
+
         <button
           type="button"
           onClick={
             handleNext
           }
           disabled={
-            nextOffset === null
+            nextOffset ==
+              null ||
+            loading
           }
           className="
             inline-flex
-            min-h-[42px]
-            cursor-pointer
+            h-10
             items-center
             justify-center
-            gap-2
-            rounded-full
-            bg-black
-            px-5
-            py-2.5
-            text-[10px]
-            font-black
+            gap-1.5
+            rounded-[11px]
+            border
+            border-[#164fa5]
+            bg-[#164fa5]
+            px-4
+            text-[11px]
+            font-bold
             text-white
-            shadow-[0_10px_24px_rgba(49,84,238,0.20)]
+            shadow-[0_8px_20px_rgba(22,79,165,0.18)]
             transition-all
+            duration-200
             hover:-translate-y-0.5
-            hover:shadow-[0_14px_30px_rgba(49,84,238,0.26)]
+            hover:bg-[#0b216c]
             disabled:cursor-not-allowed
             disabled:opacity-40
           "
@@ -578,7 +578,7 @@ export default function MockTestList({
           Next
 
           <ChevronRight
-            size={15}
+            size={14}
           />
         </button>
       </div>

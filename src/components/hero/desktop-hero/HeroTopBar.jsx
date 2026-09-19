@@ -1,4 +1,8 @@
-import Link from "next/link";
+"use client";
+
+import {
+  useState,
+} from "react";
 
 import {
   ArrowUpRight,
@@ -6,100 +10,176 @@ import {
   ListChecks,
 } from "lucide-react";
 
+import MainCoursesModal from "@/components/main-course-modal/MainCoursesModal";
+
 export default function HeroTopBar() {
+  const [
+    destinationPath,
+    setDestinationPath,
+  ] = useState("");
+
+  const openTopicWiseModal = () => {
+    setDestinationPath(
+      "topic-wise-exams"
+    );
+  };
+
+  const openStatementWiseModal =
+    () => {
+      setDestinationPath(
+        "statement-type-exams"
+      );
+    };
+
+  const handleClose = () => {
+    setDestinationPath("");
+  };
+
   return (
-    <div
-      className="
-        relative
-        z-20
-        flex
-        items-center
-        justify-between
-        gap-3
-        px-5
-        pt-5
-        sm:px-7
-        lg:px-10
-      "
-    >
-      {/* Online learners */}
+    <>
       <div
         className="
-          inline-flex
+          relative
+          z-20
+          flex
           items-center
-          gap-2
-          rounded-full
-          bg-white/90
-          px-4
-          py-2
-          text-[11px]
-          font-semibold
-          text-[#0b216c]
-          shadow-sm
-          backdrop-blur
+          justify-between
+          gap-3
+          px-5
+          pt-5
+          sm:px-7
+          lg:px-10
         "
       >
-        <span className="relative flex h-2.5 w-2.5">
-          <span
-            className="
-              absolute
-              inline-flex
-              h-full
-              w-full
-              animate-ping
-              rounded-full
-              bg-green-500
-              opacity-60
-            "
-          />
+        {/* ONLINE LEARNERS */}
 
+        <div
+          className="
+            inline-flex
+            items-center
+            gap-2
+            rounded-full
+            bg-white/90
+            px-4
+            py-2
+            text-[11px]
+            font-semibold
+            text-[#0b216c]
+            shadow-sm
+            backdrop-blur
+          "
+        >
           <span
             className="
               relative
-              inline-flex
+              flex
               h-2.5
               w-2.5
-              rounded-full
-              bg-green-600
             "
-          />
-        </span>
+          >
+            <span
+              className="
+                absolute
+                inline-flex
+                h-full
+                w-full
+                animate-ping
+                rounded-full
+                bg-green-500
+                opacity-60
+              "
+            />
 
-        1000+ Learners Online
+            <span
+              className="
+                relative
+                inline-flex
+                h-2.5
+                w-2.5
+                rounded-full
+                bg-green-600
+              "
+            />
+          </span>
+
+          1000+ Learners Online
+        </div>
+
+        {/* FEATURE BUTTONS */}
+
+        <div
+          className="
+            hidden
+            items-center
+            gap-3
+            md:flex
+          "
+        >
+          <FeaturePill
+            onClick={
+              openTopicWiseModal
+            }
+            icon={
+              <ListChecks
+                size={15}
+              />
+            }
+          >
+            Topic/Sub topic wise
+            exams
+          </FeaturePill>
+
+          <FeaturePill
+            onClick={
+              openStatementWiseModal
+            }
+            icon={
+              <FileQuestion
+                size={15}
+              />
+            }
+          >
+            Topic wise statement
+            type
+          </FeaturePill>
+        </div>
       </div>
 
-      {/* Important links */}
-      <div className="hidden items-center gap-3 md:flex">
-        <FeaturePill
-          href="/topic-wise-exams"
-          icon={<ListChecks size={15} />}
-        >
-          Topic/Sub topic wise exams
-        </FeaturePill>
+      {/* MAIN COURSE MODAL */}
 
-        <FeaturePill
-          href="/statement-type-exams"
-          icon={<FileQuestion size={15} />}
-        >
-          Topic wise statement type
-        </FeaturePill>
-      </div>
-    </div>
+      <MainCoursesModal
+        open={Boolean(
+          destinationPath
+        )}
+        onClose={
+          handleClose
+        }
+        destinationPath={
+          destinationPath
+        }
+      />
+    </>
   );
 }
 
+/* =========================================================
+   FEATURE PILL
+========================================================= */
+
 function FeaturePill({
   children,
-  href,
   icon,
+  onClick,
 }) {
   return (
-    <Link
-      href={href}
+    <button
+      type="button"
+      onClick={onClick}
       className="
         group
         relative
         inline-flex
+        cursor-pointer
         items-center
         gap-2
         rounded-full
@@ -154,6 +234,6 @@ function FeaturePill({
           group-hover:opacity-100
         "
       />
-    </Link>
+    </button>
   );
 }

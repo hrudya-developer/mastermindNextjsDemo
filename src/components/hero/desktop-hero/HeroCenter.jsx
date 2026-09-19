@@ -4,82 +4,148 @@ import HeroStats from "./HeroStats";
 
 export default function HeroCenter() {
   return (
-    <main className="">
+    <main
+      className="
+        h-full
+        min-h-0
+        w-full
+      "
+    >
       <div
         className="
           relative
           flex
-          min-h-[760px]
+          h-full
+          min-h-0
           flex-col
           overflow-hidden
           rounded-[26px]
-         shadow-sm
+          border
+          border-[#dce9f8]
+          bg-white
+          shadow-[0_18px_45px_rgba(22,79,165,0.08)]
         "
       >
-        {/* =====================================================
-            BACKGROUND
-        ====================================================== */}
+        {/* =========================================
+            XL BACKGROUND
+        ========================================= */}
 
-        {/* 
-          XL / smaller desktop:
-          1280px - 1535px
-        */}
         <div
+          aria-hidden="true"
           className="
             pointer-events-none
             absolute
             inset-0
             hidden
             bg-cover
-            bg-right
+            bg-right-bottom
             bg-no-repeat
-
-            xl:block
+            lg:block
             2xl:hidden
           "
           style={{
-            backgroundImage: "url('/assets/sampleBg1.png')",
+            backgroundImage:
+              "url('/assets/sampleBg1.png')",
           }}
         />
 
-        {/* 
-          LARGE LAPTOP / LARGE DESKTOP:
-          1536px+
-        */}
+        {/* =========================================
+            2XL BACKGROUND
+        ========================================= */}
+
         <div
+          aria-hidden="true"
           className="
             pointer-events-none
             absolute
             inset-0
             hidden
             bg-cover
-            bg-right
+            bg-right-bottom
             bg-no-repeat
-
             2xl:block
           "
           style={{
-            backgroundImage: "url('/assets/sampleBg2.png')",
+            backgroundImage:
+              "url('/assets/sampleBg2.png')",
           }}
         />
 
-        {/* =====================================================
-            CONTENT
-        ====================================================== */}
+        {/* =========================================
+            SOFT DECORATIVE LIGHT
+        ========================================= */}
 
-        <div className="relative z-10">
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            -left-24
+            -top-24
+            h-72
+            w-72
+            rounded-full
+            bg-[#00b5e8]/10
+            blur-[100px]
+          "
+        />
+
+        <div
+          aria-hidden="true"
+          className="
+            pointer-events-none
+            absolute
+            -bottom-20
+            right-[18%]
+            h-64
+            w-64
+            rounded-full
+            bg-violet-300/10
+            blur-[100px]
+          "
+        />
+
+        {/* =========================================
+            TOP BAR
+        ========================================= */}
+
+        <div
+          className="
+            relative
+            z-20
+            shrink-0
+          "
+        >
           <HeroTopBar />
         </div>
 
-        <div className="relative z-10">
+        {/* =========================================
+            CONTENT AREA
+        ========================================= */}
+
+        <div
+          className="
+            relative
+            z-10
+            min-h-0
+            flex-1
+            overflow-hidden
+          "
+        >
           <HeroContent />
         </div>
 
-        {/* =====================================================
-            STATS AT BOTTOM
-        ====================================================== */}
+        {/* =========================================
+            STATS
+        ========================================= */}
 
-        <div className="relative z-20 mt-auto">
+        <div
+          className="
+            relative
+            z-20
+            shrink-0
+          "
+        >
           <HeroStats />
         </div>
       </div>

@@ -6,156 +6,143 @@ import {
 } from "lucide-react";
 
 export default function MockQuestionPagination({
-  currentPage,
-  totalPages,
-  onChange,
+  currentPage = 1,
+  totalPages = 1,
+  pages = [],
+  onPageChange,
 }) {
-  if (!totalPages || totalPages <= 1) {
+  if (
+    totalPages <= 1
+  ) {
     return null;
-  }
-
-  function handlePrevious() {
-    if (currentPage <= 1) {
-      return;
-    }
-
-    onChange(currentPage - 1);
-  }
-
-  function handleNext() {
-    if (currentPage >= totalPages) {
-      return;
-    }
-
-    onChange(currentPage + 1);
   }
 
   return (
     <div
       className="
-        mt-8
         flex
-        flex-col
+        flex-wrap
         items-center
-        justify-between
-        gap-4
-        rounded-[20px]
-        border
-        border-blue-100
-        bg-gradient-to-r
-        from-blue-50
-        via-white
-        to-indigo-50
-        p-4
-        sm:flex-row
+        justify-center
+        gap-2
+        border-t
+        border-slate-100
+        px-5
+        py-5
       "
     >
       <button
         type="button"
-        onClick={handlePrevious}
-        disabled={currentPage <= 1}
+        disabled={
+          currentPage <= 1
+        }
+        onClick={() =>
+          onPageChange?.(
+            currentPage - 1
+          )
+        }
         className="
           inline-flex
-          cursor-pointer
+          h-10
           items-center
           justify-center
-          gap-2
-          rounded-full
+          gap-1.5
+          rounded-xl
           border
-          border-blue-100
+          border-slate-200
           bg-white
-          px-5
-          py-2.5
+          px-4
           text-[11px]
           font-bold
-          text-[#164fa5]
-          shadow-sm
-          transition-all
-          hover:border-[#164fa5]/30
+          text-slate-600
+          transition
+          hover:border-blue-200
           hover:bg-blue-50
           disabled:cursor-not-allowed
           disabled:opacity-40
         "
       >
-        <ChevronLeft size={15} />
+        <ChevronLeft
+          size={14}
+        />
 
         Previous
       </button>
 
-      <div className="flex items-center gap-2">
-        {Array.from(
-          {
-            length: totalPages,
-          },
-          (_, index) =>
-            index + 1
-        ).map((page) => (
+      {pages.map(
+        (page) => (
           <button
-            key={page}
+            key={
+              page
+            }
             type="button"
             onClick={() =>
-              onChange(page)
+              onPageChange?.(
+                page
+              )
             }
             className={`
               flex
-              h-9
-              w-9
-              cursor-pointer
+              h-10
+              w-10
               items-center
               justify-center
-              rounded-full
+              rounded-xl
+              border
               text-[11px]
               font-black
-              transition-all
+              transition
 
               ${
-                currentPage === page
+                page ===
+                currentPage
                   ? `
-                      bg-gradient-to-br
-                      from-[#164fa5]
-                      to-[#017cc0]
+                      border-[#164fa5]
+                      bg-[#164fa5]
                       text-white
-                      shadow-[0_7px_18px_rgba(22,79,165,0.25)]
+                      shadow-[0_8px_20px_rgba(22,79,165,0.20)]
                     `
                   : `
-                      border
-                      border-blue-100
+                      border-slate-200
                       bg-white
-                      text-slate-500
-                      hover:border-[#164fa5]/30
-                      hover:text-[#164fa5]
+                      text-slate-600
+                      hover:border-blue-200
+                      hover:bg-blue-50
                     `
               }
             `}
           >
             {page}
           </button>
-        ))}
-      </div>
+        )
+      )}
 
       <button
         type="button"
-        onClick={handleNext}
         disabled={
-          currentPage >= totalPages
+          currentPage >=
+          totalPages
+        }
+        onClick={() =>
+          onPageChange?.(
+            currentPage + 1
+          )
         }
         className="
           inline-flex
-          cursor-pointer
+          h-10
           items-center
           justify-center
-          gap-2
-          rounded-full
+          gap-1.5
+          rounded-xl
           bg-gradient-to-r
           from-[#164fa5]
-          to-[#017cc0]
-          px-5
-          py-2.5
+          to-[#017dc0]
+          px-4
           text-[11px]
           font-bold
           text-white
-          shadow-[0_8px_20px_rgba(22,79,165,0.20)]
-          transition-all
+          transition
           hover:-translate-y-0.5
           disabled:cursor-not-allowed
           disabled:opacity-40
@@ -163,7 +150,9 @@ export default function MockQuestionPagination({
       >
         Next
 
-        <ChevronRight size={15} />
+        <ChevronRight
+          size={14}
+        />
       </button>
     </div>
   );

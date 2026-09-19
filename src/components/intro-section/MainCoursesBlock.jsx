@@ -9,7 +9,7 @@ import MainCourseCard from "./MainCourseCard";
 
 const courseContent = {
   1: {
-    href: "/main-courses/kerala-psc",
+    href: "/kerala-psc-coaching",
     points: [
       "Topic-wise Study Materials",
       "Previous Year Questions",

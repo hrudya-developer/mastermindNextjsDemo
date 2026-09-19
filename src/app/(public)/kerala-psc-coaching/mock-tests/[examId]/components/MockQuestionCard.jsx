@@ -1,68 +1,75 @@
-"use client";
-
-import {
-  useState,
-} from "react";
-
-import {
-  Check,
-  X,
-} from "lucide-react";
-
 export default function MockQuestionCard({
   question,
-  number,
+  questionNumber,
+  selectedAnswer,
+  imagePath = "",
+  onAnswer,
 }) {
-  const [
-    selected,
-    setSelected,
-  ] = useState(null);
+  if (!question) {
+    return null;
+  }
 
   const options = [
     {
       key: "A",
-      text:
+      value:
         question?.option1,
     },
     {
       key: "B",
-      text:
+      value:
         question?.option2,
     },
     {
       key: "C",
-      text:
+      value:
         question?.option3,
     },
     {
       key: "D",
-      text:
+      value:
         question?.option4,
     },
   ].filter(
     (option) =>
-      option.text
+      option.value !==
+        undefined &&
+      option.value !==
+        null &&
+      String(
+        option.value
+      ).trim() !== ""
   );
 
-  const correctKey =
-    String(
-      question?.answerkey ||
-        ""
-    )
-      .trim()
-      .toUpperCase();
+  const attached =
+    question?.attached ||
+    question?.image ||
+    "";
 
-  const answered =
-    selected !== null;
+  const imageUrl =
+    attached &&
+    imagePath
+      ? `${imagePath.replace(
+          /\/+$/,
+          ""
+        )}/${String(
+          attached
+        ).replace(
+          /^\/+/,
+          ""
+        )}`
+      : "";
 
   return (
     <article
       className="
-        overflow-hidden
-        rounded-[22px]
+        rounded-[20px]
         border
         border-[#dce8f7]
         bg-white
+        p-5
+        shadow-[0_8px_24px_rgba(15,23,42,0.04)]
+        sm:p-6
       "
     >
       <div
@@ -70,11 +77,6 @@ export default function MockQuestionCard({
           flex
           items-start
           gap-4
-          bg-gradient-to-r
-          from-[#f2f6ff]
-          via-[#faf7ff]
-          to-[#fff5fa]
-          p-5
         "
       >
         <div
@@ -85,164 +87,160 @@ export default function MockQuestionCard({
             shrink-0
             items-center
             justify-center
-            rounded-[13px]
+            rounded-xl
             bg-gradient-to-br
-            from-[#5b216d]
-            to-[#3154ee]
-            text-[11px]
+            from-[#164fa5]
+            to-[#017dc0]
+            text-xs
             font-black
             text-white
           "
         >
-          {number}
+          {questionNumber}
         </div>
 
-        <div>
+        <div
+          className="
+            min-w-0
+            flex-1
+          "
+        >
           <p
             className="
-              text-[9px]
-              font-black
-              uppercase
-              tracking-[0.12em]
-              text-[#3154ee]
-            "
-          >
-            Question {number}
-          </p>
-
-          <p
-            className="
-              mt-2
+              whitespace-pre-wrap
               text-[14px]
               font-bold
               leading-7
-              text-[#172554]
+              text-[#0b1f44]
+              sm:text-[15px]
             "
           >
             {question?.question}
           </p>
-        </div>
-      </div>
 
-      <div
-        className="
-          grid
-          grid-cols-1
-          gap-3
-          p-5
-          lg:grid-cols-2
-        "
-      >
-        {options.map(
-          (option) => {
-            const isSelected =
-              selected ===
-              option.key;
+          {imageUrl ? (
+            <img
+              src={
+                imageUrl
+              }
+              alt=""
+              className="
+                mt-4
+                max-h-[320px]
+                max-w-full
+                rounded-xl
+                border
+                border-slate-200
+                object-contain
+              "
+            />
+          ) : null}
 
-            const isCorrect =
-              answered &&
-              option.key ===
-                correctKey;
+          <div
+            className="
+              mt-5
+              grid
+              grid-cols-1
+              gap-3
+              md:grid-cols-2
+            "
+          >
+            {options.map(
+              (
+                option
+              ) => {
+                const selected =
+                  selectedAnswer ===
+                  option.key;
 
-            const isWrong =
-              answered &&
-              isSelected &&
-              !isCorrect;
-
-            return (
-              <button
-                key={
-                  option.key
-                }
-                type="button"
-                disabled={
-                  answered
-                }
-                onClick={() =>
-                  setSelected(
-                    option.key
-                  )
-                }
-                className={`
-                  flex
-                  cursor-pointer
-                  items-start
-                  gap-3
-                  rounded-[16px]
-                  border
-                  px-4
-                  py-4
-                  text-left
-
-                  ${
-                    isCorrect
-                      ? `
-                          border-emerald-300
-                          bg-emerald-50
-                        `
-                      : isWrong
-                        ? `
-                            border-rose-300
-                            bg-rose-50
-                          `
-                        : `
-                            border-[#e1e8f5]
-                            bg-[#fafcff]
-                            hover:border-[#3154ee]/30
-                            hover:bg-[#f4f7ff]
-                          `
-                  }
-                `}
-              >
-                <span
-                  className={`
-                    flex
-                    h-8
-                    w-8
-                    shrink-0
-                    items-center
-                    justify-center
-                    rounded-full
-                    text-[10px]
-                    font-black
-
-                    ${
-                      isCorrect
-                        ? "bg-emerald-500 text-white"
-                        : isWrong
-                          ? "bg-rose-500 text-white"
-                          : "bg-[#eaf0ff] text-[#3154ee]"
+                return (
+                  <button
+                    key={
+                      option.key
                     }
-                  `}
-                >
-                  {isCorrect ? (
-                    <Check
-                      size={14}
-                    />
-                  ) : isWrong ? (
-                    <X
-                      size={14}
-                    />
-                  ) : (
-                    option.key
-                  )}
-                </span>
+                    type="button"
+                    onClick={() =>
+                      onAnswer?.(
+                        option.key
+                      )
+                    }
+                    className={`
+                      flex
+                      min-h-[58px]
+                      w-full
+                      items-start
+                      gap-3
+                      rounded-[14px]
+                      border
+                      p-3.5
+                      text-left
+                      transition-all
+                      duration-200
 
-                <span
-                  className="
-                    pt-1
-                    text-[12px]
-                    font-semibold
-                    leading-5
-                    text-slate-600
-                  "
-                >
-                  {option.text}
-                </span>
-              </button>
-            );
-          }
-        )}
+                      ${
+                        selected
+                          ? `
+                              border-[#164fa5]
+                              bg-blue-50
+                              shadow-[0_5px_18px_rgba(22,79,165,0.08)]
+                            `
+                          : `
+                              border-slate-200
+                              bg-white
+                              hover:border-blue-200
+                              hover:bg-blue-50/40
+                            `
+                      }
+                    `}
+                  >
+                    <span
+                      className={`
+                        flex
+                        h-8
+                        w-8
+                        shrink-0
+                        items-center
+                        justify-center
+                        rounded-lg
+                        text-[11px]
+                        font-black
+
+                        ${
+                          selected
+                            ? `
+                                bg-[#164fa5]
+                                text-white
+                              `
+                            : `
+                                bg-slate-100
+                                text-slate-500
+                              `
+                        }
+                      `}
+                    >
+                      {
+                        option.key
+                      }
+                    </span>
+
+                    <span
+                      className="
+                        pt-1
+                        text-[13px]
+                        leading-6
+                        text-slate-700
+                      "
+                    >
+                      {
+                        option.value
+                      }
+                    </span>
+                  </button>
+                );
+              }
+            )}
+          </div>
+        </div>
       </div>
     </article>
   );

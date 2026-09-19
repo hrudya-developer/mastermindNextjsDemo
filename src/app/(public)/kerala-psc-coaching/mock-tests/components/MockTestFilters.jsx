@@ -31,7 +31,7 @@ const filters = [
           border
           border-[#eadff0]
           bg-white
-          p-3
+          p-3 mb-3
         "
       >
         {filters.map(
@@ -69,7 +69,7 @@ const filters = [
                           shadow-[0_8px_22px_rgba(168,50,121,0.22)]
                         `
                       : `
-                          bg-[#faf7fc]
+                          bg-[#f8eeff]
                           text-[#5b216d]
                           hover:bg-[#f3e8f5]
                         `

@@ -7,45 +7,29 @@ import {
 
 import MockTestHeader from "./MockTestHeader";
 import MockTestInstructions from "./MockTestInstructions";
-import MockTestQuestions from "./MockTestQuestions";
-
-import PremiumMockTestModal from "../../components/PremiumMockTestModal";
+import MockStartButton from "./MockStartButton";
 
 export default function MockTestDetails({
   examId,
-  cid = 1,
-  uid = 21,
+  uid,
+  cid,
+  examTitle = "",
 }) {
-  const [
-    exam,
-    setExam,
-  ] = useState(null);
+  const [exam, setExam] =
+    useState(null);
 
   const [
     instructions,
     setInstructions,
   ] = useState([]);
 
-  const [
-    loading,
-    setLoading,
-  ] = useState(true);
+  const [loading, setLoading] =
+    useState(true);
 
-  const [
-    error,
-    setError,
-  ] = useState("");
-
-  const [
-    premiumBlocked,
-    setPremiumBlocked,
-  ] = useState(false);
+  const [error, setError] =
+    useState("");
 
   useEffect(() => {
-    if (!examId) {
-      return;
-    }
-
     const controller =
       new AbortController();
 
@@ -53,57 +37,49 @@ export default function MockTestDetails({
       try {
         setLoading(true);
         setError("");
-        setExam(null);
-        setInstructions([]);
-        setPremiumBlocked(false);
+
+        const params =
+          new URLSearchParams({
+            cid:
+              String(cid),
+
+            uid:
+              String(uid),
+
+            examid:
+              String(examId),
+          });
 
         const response =
           await fetch(
-            `/api/mock-tests/details?cid=${encodeURIComponent(
-              cid
-            )}&uid=${encodeURIComponent(
-              uid
-            )}&examid=${encodeURIComponent(
-              examId
-            )}`,
+            `/api/mock-tests/details?${params.toString()}`,
             {
               cache:
                 "no-store",
+
               signal:
                 controller.signal,
             }
           );
 
-        const text =
-          await response.text();
-
-        let result = null;
-
-        try {
-          result =
-            text
-              ? JSON.parse(text)
-              : null;
-        } catch {
-          throw new Error(
-            "Server returned an invalid response."
-          );
-        }
+        const result =
+          await response.json();
 
         if (!response.ok) {
           throw new Error(
             result?.message ||
-              "Unable to load mock test details."
+              "Unable to load mock test."
           );
         }
 
-        const examItem =
+        const examData =
           Array.isArray(
             result?.exam
           )
             ? result.exam[0] ??
               null
-            : null;
+            : result?.exam ??
+              null;
 
         const instructionData =
           Array.isArray(
@@ -112,31 +88,9 @@ export default function MockTestDetails({
             ? result.data
             : [];
 
-        if (!examItem) {
-          throw new Error(
-            "Mock test not found."
-          );
-        }
-
-        const access =
-          String(
-            examItem?.access ||
-              ""
-          )
-            .toLowerCase()
-            .trim();
-
-        setExam(examItem);
-
-        if (
-          access === "paid"
-        ) {
-          setPremiumBlocked(
-            true
-          );
-
-          return;
-        }
+        setExam(
+          examData
+        );
 
         setInstructions(
           instructionData
@@ -150,13 +104,13 @@ export default function MockTestDetails({
         }
 
         console.error(
-          "Mock test details error:",
+          "Mock test details:",
           error
         );
 
         setError(
           error?.message ||
-            "Unable to load mock test details."
+            "Unable to load mock test."
         );
       } finally {
         if (
@@ -175,20 +129,36 @@ export default function MockTestDetails({
     };
   }, [
     examId,
-    cid,
     uid,
+    cid,
   ]);
 
   if (loading) {
     return (
       <div
         className="
-          min-h-[420px]
-          animate-pulse
-          rounded-[28px]
-          bg-white
+          mt-20
+          space-y-5
         "
-      />
+      >
+        <div
+          className="
+            h-[250px]
+            animate-pulse
+            rounded-[28px]
+            bg-slate-200
+          "
+        />
+
+        <div
+          className="
+            h-[200px]
+            animate-pulse
+            rounded-[24px]
+            bg-white
+          "
+        />
+      </div>
     );
   }
 
@@ -196,68 +166,75 @@ export default function MockTestDetails({
     return (
       <div
         className="
+          mt-20
           rounded-[24px]
           border
-          border-red-100
+          border-red-200
           bg-red-50
           px-6
           py-12
           text-center
-          text-sm
-          font-semibold
-          text-red-500
         "
       >
-        {error}
+        <p
+          className="
+            text-[13px]
+            font-bold
+            text-red-600
+          "
+        >
+          {error}
+        </p>
       </div>
     );
   }
 
-  if (!exam) {
-    return null;
-  }
+  const completeExam = {
+    ...(exam || {}),
 
-  if (premiumBlocked) {
-    return (
-      <>
-        <div
-          className="
-            min-h-[320px]
-            rounded-[26px]
-            border
-            border-[#dce8f7]
-            bg-white
-          "
-        />
+    id:
+      exam?.id ??
+      examId,
 
-        <PremiumMockTestModal
-          open
-          test={exam}
-          onClose={() => {
-            window.location.href =
-              "/kerala-psc-coaching/mock-tests";
-          }}
-        />
-      </>
-    );
-  }
+    exam_name:
+      exam?.exam_name ||
+      examTitle ||
+      "",
+  };
 
   return (
     <>
       <MockTestHeader
-        exam={exam}
-      />
-
-      <MockTestInstructions
-        instructions={
-          instructions
+        exam={
+          completeExam
         }
       />
 
-      <MockTestQuestions
-        examId={examId}
-        cid={cid}
-        uid={uid}
+      <div className="mt-6">
+        <MockTestInstructions
+          exam={
+            completeExam
+          }
+          instructions={
+            instructions
+          }
+        />
+      </div>
+
+      <MockStartButton
+        examId={
+          examId
+        }
+        uid={
+          uid
+        }
+        cid={
+          cid
+        }
+        title={
+          completeExam
+            ?.exam_name
+        }
       />
     </>
   );

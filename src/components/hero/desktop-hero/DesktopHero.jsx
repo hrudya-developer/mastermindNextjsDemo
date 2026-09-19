@@ -10,7 +10,6 @@ export default function DesktopHero() {
         w-full
         overflow-hidden
         bg-[#f4f9ff]
-
         pt-[68px]
         sm:pt-[74px]
         lg:pt-[104px]
@@ -23,12 +22,16 @@ export default function DesktopHero() {
           w-full
           max-w-[1600px]
           grid-cols-1
+          items-stretch
           gap-4
           px-3
           pb-4
 
           sm:px-4
 
+          lg:h-[calc(100dvh-140px)]
+          lg:min-h-[620px]
+          lg:max-h-[790px]
           lg:grid-cols-[minmax(0,1fr)_310px]
           lg:gap-4
           lg:px-6
@@ -38,11 +41,33 @@ export default function DesktopHero() {
           xl:px-8
         "
       >
-        {/* MAIN HERO */}
-        <HeroCenter />
+        {/* =========================================
+            MAIN HERO
+        ========================================= */}
 
-        {/* RIGHT LEARNING HUB */}
-        <div className="hidden lg:block">
+        <div
+          className="
+            h-full
+            min-h-0
+            min-w-0
+          "
+        >
+          <HeroCenter />
+        </div>
+
+        {/* =========================================
+            RIGHT LEARNING HUB
+        ========================================= */}
+
+        <div
+          className="
+            hidden
+            h-full
+            min-h-0
+            min-w-0
+            lg:block
+          "
+        >
           <RightSidebar />
         </div>
       </div>
