@@ -3,258 +3,127 @@ import {
 } from "next/navigation";
 
 import {
-  getScertFolders,
-  getScertTestsByClassId,
   getScertExamDetails,
 } from "@/lib/scertHelper";
 
 import ScertInstructions from "./components/ScertInstructions";
 
-/* =========================================================
-   CREATE SLUG
-========================================================= */
+export const metadata = {
+  title:
+    "SCERT Test | MasterMind Academy",
 
-function createSlug(
-  value = ""
-) {
-  return String(value)
-    .toLowerCase()
-    .trim()
-    .replace(
-      /[^a-z0-9]+/g,
-      "-"
-    )
-    .replace(
-      /^-+|-+$/g,
-      ""
-    );
-}
+  description:
+    "Practice Kerala PSC SCERT questions with MasterMind Academy.",
+};
 
 /* =========================================================
-   FIND SCERT TEST USING SLUG
-
-   Example:
-
-   class-6-basic-science-practice-test-1
-
-   becomes:
-
-   {
-     classId: 2,
-     examId: 20,
-     test: {...}
-   }
-========================================================= */
-
-async function findScertTestBySlug(
-  testSlug
-) {
-  /* =============================================
-     GET AVAILABLE CLASSES
-  ============================================= */
-
-  const foldersResult =
-    await getScertFolders({
-      uid: 0,
-      cid: 1,
-      offset: 0,
-    });
-
-  const folders =
-    Array.isArray(
-      foldersResult?.data
-    )
-      ? foldersResult.data
-      : [];
-
-  /* =============================================
-     CHECK EACH CLASS
-  ============================================= */
-
-  for (
-    const folder of folders
-  ) {
-    const classId =
-      folder?.id;
-
-    if (!classId) {
-      continue;
-    }
-
-    /* ===========================================
-       IMPORTANT
-
-       classId becomes cid:
-
-       Class 5 -> cid 1
-       Class 6 -> cid 2
-       Class 7 -> cid 3
-    =========================================== */
-
-    const testsResult =
-      await getScertTestsByClassId({
-        uid: 0,
-
-        classId,
-
-        filter: 0,
-      });
-
-    const tests =
-      Array.isArray(
-        testsResult?.data
-      )
-        ? testsResult.data
-        : [];
-
-    const selectedTest =
-      tests.find(
-        (test) =>
-          createSlug(
-            test?.exam_name
-          ) ===
-          String(testSlug)
-      );
-
-    if (selectedTest) {
-      return {
-        classId,
-
-        className:
-          folder?.class ||
-          "",
-
-        examId:
-          selectedTest.id,
-
-        test:
-          selectedTest,
-      };
-    }
-  }
-
-  return null;
-}
-
-/* =========================================================
-   METADATA
-========================================================= */
-
-export async function generateMetadata({
-  params,
-}) {
-  const {
-    testSlug,
-  } = await params;
-
-  const selected =
-    await findScertTestBySlug(
-      testSlug
-    );
-
-  if (!selected) {
-    return {
-      title:
-        "SCERT Test | MasterMind Academy",
-
-      robots: {
-        index: false,
-        follow: false,
-      },
-    };
-  }
-
-  return {
-    title:
-      `${selected.test.exam_name} | MasterMind Academy`,
-
-    description:
-      `Practice ${selected.test.exam_name} for Kerala PSC preparation.`,
-  };
-}
-
-/* =========================================================
-   PAGE
+   SCERT TEST DETAILS
 ========================================================= */
 
 export default async function ScertExamDetailsPage({
   params,
+  searchParams,
 }) {
   const {
     testSlug,
   } = await params;
 
-  /* =============================================
-     FIND CLASS + EXAM
-  ============================================= */
+  const search =
+    await searchParams;
 
-  const selected =
-    await findScertTestBySlug(
-      testSlug
-    );
+  const examId =
+    search?.examId;
+
+  const classId =
+    search?.classId;
+
+  /* =======================================================
+     VALIDATION
+  ======================================================= */
 
   if (
-    !selected?.examId ||
-    !selected?.classId
+    !testSlug ||
+    !examId ||
+    !classId
   ) {
     notFound();
   }
 
-  const {
-    classId,
-    examId,
-    className,
-    test,
-  } = selected;
-
-  console.log(
-    "SCERT SELECTED TEST:",
-    {
-      testSlug,
-
-      classId,
-
-      backendCid:
-        classId,
-
-      examId,
-
-      className,
-
-      examName:
-        test?.exam_name,
-    }
-  );
-
-  /* =============================================
-     GET CORRECT EXAM DETAILS
+  /* =======================================================
+     DETAILS API
 
      IMPORTANT:
-
-     cid MUST be selected class id.
-
-     Class 6 example:
-     cid = 2
-     examId = 20
-  ============================================= */
+     getMockTestDetails expects course cid = 1.
+     classId is NOT the cid here.
+  ======================================================= */
 
   const detailsResult =
     await getScertExamDetails({
       uid: 0,
 
-      cid:
-        classId,
+      cid: 1,
 
       examId,
+
+      offset: 0,
     });
 
-  console.log(
-    "SCERT DETAILS RESULT:",
-    detailsResult
-  );
+  if (
+    !detailsResult?.status ||
+    !detailsResult?.exam
+  ) {
+    return (
+      <main
+        className="
+          min-h-screen
+          bg-[#f5f9ff]
+          pt-[120px]
+        "
+      >
+        <div
+          className="
+            mx-auto
+            max-w-[900px]
+            px-4
+          "
+        >
+          <div
+            className="
+              rounded-[24px]
+              border
+              border-red-100
+              bg-white
+              p-8
+              text-center
+            "
+          >
+            <h1
+              className="
+                text-xl
+                font-black
+                text-[#071f55]
+              "
+            >
+              Unable to load SCERT test
+            </h1>
+
+            <p
+              className="
+                mt-2
+                text-sm
+                text-slate-500
+              "
+            >
+              Please refresh and try again.
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   const exam =
-    detailsResult?.exam;
+    detailsResult.exam;
 
   const instructions =
     Array.isArray(
@@ -262,14 +131,6 @@ export default async function ScertExamDetailsPage({
     )
       ? detailsResult.instructions
       : [];
-
-  if (!exam) {
-    notFound();
-  }
-
-  /* =============================================
-     PAGE
-  ============================================= */
 
   return (
     <main
@@ -294,6 +155,7 @@ export default async function ScertExamDetailsPage({
   instructions={instructions}
   testSlug={testSlug}
   classId={classId}
+  examId={examId}
 />
       </div>
     </main>

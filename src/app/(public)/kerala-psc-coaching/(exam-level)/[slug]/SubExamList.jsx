@@ -12,9 +12,14 @@ import {
 
 import SubExamCard from "./SubExamCard";
 
+/* =========================================================
+   SUB EXAM LIST
+========================================================= */
+
 export default function SubExamList({
-  cid,
+  cid = "1",
   subId,
+  levelSlug,
 }) {
   const [
     exams,
@@ -40,6 +45,10 @@ export default function SubExamList({
     retryCount,
     setRetryCount,
   ] = useState(0);
+
+  /* =======================================================
+     FETCH SUB EXAMS
+  ======================================================= */
 
   useEffect(() => {
     if (
@@ -173,6 +182,10 @@ export default function SubExamList({
     retryCount,
   ]);
 
+  /* =======================================================
+     UI
+  ======================================================= */
+
   return (
     <section
       className="
@@ -192,6 +205,7 @@ export default function SubExamList({
       "
     >
       {/* DECORATIVE GLOW */}
+
       <div
         aria-hidden="true"
         className="
@@ -208,6 +222,7 @@ export default function SubExamList({
       />
 
       {/* HEADER */}
+
       <div
         className="
           relative
@@ -292,14 +307,18 @@ export default function SubExamList({
               "
             >
               {exams.length}{" "}
-              {exams.length === 1
+              {exams.length ===
+              1
                 ? "Exam"
                 : "Exams"}
             </span>
           )}
       </div>
 
-      {/* LOADING */}
+      {/* ===================================================
+          LOADING STATE
+      =================================================== */}
+
       {loading && (
         <div
           className="
@@ -366,7 +385,10 @@ export default function SubExamList({
         </div>
       )}
 
-      {/* EXAM CARDS */}
+      {/* ===================================================
+          EXAM CARDS
+      =================================================== */}
+
       {!loading &&
         !error &&
         exams.length >
@@ -383,26 +405,23 @@ export default function SubExamList({
             "
           >
             {exams.map(
-              (
-                exam,
-                index
-              ) => (
+              (exam) => (
                 <SubExamCard
-                  key={
-                    exam?.id ??
-                    `${exam?.exam}-${index}`
-                  }
-                  exam={exam}
-                  iconPath={
-                    iconPath
-                  }
-                />
+                key={exam.id}
+                exam={exam}
+                cid={cid}
+                iconPath={iconPath}
+                levelSlug={levelSlug}
+              />
               )
             )}
           </div>
         )}
 
-      {/* EMPTY STATE */}
+      {/* ===================================================
+          EMPTY STATE
+      =================================================== */}
+
       {!loading &&
         !error &&
         exams.length ===
@@ -464,7 +483,10 @@ export default function SubExamList({
           </div>
         )}
 
-      {/* ERROR STATE */}
+      {/* ===================================================
+          ERROR STATE
+      =================================================== */}
+
       {!loading &&
         error && (
           <div

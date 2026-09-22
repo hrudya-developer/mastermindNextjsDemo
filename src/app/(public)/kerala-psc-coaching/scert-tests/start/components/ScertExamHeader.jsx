@@ -62,7 +62,7 @@ export default function ScertExamHeader({
         px-6
         py-7
         text-white
-        sm:px-8
+        sm:px-8 mt-20
       "
     >
       <div

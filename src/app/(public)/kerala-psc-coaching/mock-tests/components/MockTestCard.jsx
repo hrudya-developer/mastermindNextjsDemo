@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import {
   ArrowRight,
@@ -7,6 +11,7 @@ import {
   FileQuestion,
   LockKeyhole,
   Trophy,
+  X,
 } from "lucide-react";
 
 export default function MockTestCard({
@@ -14,6 +19,11 @@ export default function MockTestCard({
   uid = 0,
   cid = 1,
 }) {
+  const router = useRouter();
+
+  const [showPremiumModal, setShowPremiumModal] =
+    useState(false);
+
   if (!test?.id) {
     return null;
   }
@@ -21,7 +31,8 @@ export default function MockTestCard({
   const examId = test.id;
 
   const examName =
-    test?.exam_name || "";
+    test?.exam_name ||
+    "Kerala PSC Mock Test";
 
   const totalQuestions =
     test?.total_questions;
@@ -44,325 +55,363 @@ export default function MockTestCard({
   const premium =
     access === "paid";
 
+  function openPremiumModal(event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+
+    setShowPremiumModal(true);
+  }
+
+  function goToLogin() {
+    setShowPremiumModal(false);
+    router.push("/login");
+  }
+
   return (
-    <article
-      className={`
-        group
-        relative
-        flex
-        h-full
-        flex-col
-        overflow-hidden
-        rounded-[24px]
-        border
-        p-5
-        transition-all
-        duration-300
-        hover:-translate-y-1
-
-        ${
-          premium
-            ? `
-                border-amber-200
-                bg-gradient-to-br
-                from-amber-50
-                via-white
-                to-orange-50
-                shadow-[0_12px_35px_rgba(245,158,11,0.08)]
-                hover:shadow-[0_22px_45px_rgba(245,158,11,0.14)]
-              `
-            : `
-                border-emerald-200
-                bg-gradient-to-br
-                from-emerald-50
-                via-white
-                to-green-50
-                shadow-[0_12px_35px_rgba(16,185,129,0.08)]
-                hover:shadow-[0_22px_45px_rgba(16,185,129,0.14)]
-              `
-        }
-      `}
-    >
-      {/* DECORATIVE GLOW */}
-
-      <div
-        aria-hidden="true"
+    <>
+      <article
         className={`
-          pointer-events-none
-          absolute
-          -right-16
-          -top-16
-          h-40
-          w-40
-          rounded-full
-          blur-3xl
-
+          group
+          relative
+          flex
+          h-full
+          flex-col
+          overflow-hidden
+          rounded-[24px]
+          border
+          p-5
+          transition-all
+          duration-300
+          hover:-translate-y-1
           ${
             premium
-              ? "bg-amber-200/40"
-              : "bg-emerald-200/40"
+              ? `
+                  border-amber-200
+                  bg-gradient-to-br
+                  from-amber-50
+                  via-white
+                  to-orange-50
+                `
+              : `
+                  border-emerald-200
+                  bg-gradient-to-br
+                  from-emerald-50
+                  via-white
+                  to-green-50
+                `
           }
         `}
-      />
-
-      {/* TOP */}
-
-      <div
-        className="
-          relative
-          z-10
-          flex
-          items-start
-          justify-between
-          gap-3
-        "
       >
-        {/* ICON */}
+        {/* TOP */}
 
-        <div
-          className={`
-            flex
-            h-11
-            w-11
-            shrink-0
-            items-center
-            justify-center
-            rounded-[13px]
-
-            ${
-              premium
-                ? `
-                    bg-gradient-to-br
-                    from-amber-100
-                    to-orange-100
-                    text-amber-700
-                  `
-                : `
-                    bg-gradient-to-br
-                    from-emerald-100
-                    to-green-100
-                    text-emerald-700
-                  `
-            }
-          `}
-        >
-          {premium ? (
-            <Crown size={20} />
-          ) : (
-            <BookOpen size={20} />
-          )}
-        </div>
-
-        {/* ACCESS BADGE */}
-
-        <span
-          className={`
-            inline-flex
-            items-center
-            gap-1.5
-            rounded-full
-            border
-            px-3
-            py-1.5
-            text-[9px]
-            font-black
-            uppercase
-            tracking-[0.05em]
-
-            ${
-              premium
-                ? `
-                    border-amber-200
-                    bg-amber-100
-                    text-amber-700
-                  `
-                : `
-                    border-emerald-200
-                    bg-emerald-100
-                    text-emerald-700
-                  `
-            }
-          `}
-        >
-          {premium ? (
-            <Crown size={11} />
-          ) : null}
-
-          {premium
-            ? "Premium"
-            : "Free"}
-        </span>
-      </div>
-
-      {/* CONTENT */}
-
-      <div
-        className="
-          relative
-          z-10
-          mt-5
-        "
-      >
-        {course ? (
-          <p
+        <div className="flex items-start justify-between">
+          <div
             className={`
-              text-[9px]
-              font-black
-              uppercase
-              tracking-[0.1em]
-
+              flex
+              h-11
+              w-11
+              items-center
+              justify-center
+              rounded-[13px]
               ${
                 premium
-                  ? "text-amber-700"
-                  : "text-emerald-700"
+                  ? "bg-amber-100 text-amber-700"
+                  : "bg-emerald-100 text-emerald-700"
               }
             `}
           >
-            {course}
-          </p>
-        ) : null}
+            {premium ? (
+              <Crown size={20} />
+            ) : (
+              <BookOpen size={20} />
+            )}
+          </div>
 
-        <h3
-          className="
-            mt-2
-            line-clamp-2
-            text-[17px]
-            font-extrabold
-            leading-6
-            text-[#0b1f44]
-          "
-        >
-          {examName}
-        </h3>
+          <span
+            className={`
+              rounded-full
+              px-3
+              py-1.5
+              text-[9px]
+              font-black
+              uppercase
+              ${
+                premium
+                  ? "bg-amber-100 text-amber-700"
+                  : "bg-emerald-100 text-emerald-700"
+              }
+            `}
+          >
+            {premium
+              ? "Premium"
+              : "Free"}
+          </span>
+        </div>
 
-        {subcourse ? (
-          <p
+        {/* CONTENT */}
+
+        <div className="mt-5">
+          {course && (
+            <p
+              className={`
+                text-[9px]
+                font-black
+                uppercase
+                tracking-[0.1em]
+                ${
+                  premium
+                    ? "text-amber-700"
+                    : "text-emerald-700"
+                }
+              `}
+            >
+              {course}
+            </p>
+          )}
+
+          <h3
             className="
               mt-2
-              line-clamp-1
-              text-[11px]
-              font-medium
-              text-slate-500
+              text-[17px]
+              font-extrabold
+              text-[#0b1f44]
             "
           >
-            {subcourse}
-          </p>
-        ) : null}
-      </div>
+            {examName}
+          </h3>
 
-      {/* INFORMATION */}
+          {subcourse && (
+            <p className="mt-2 text-[11px] text-slate-500">
+              {subcourse}
+            </p>
+          )}
+        </div>
 
-      <div
-        className="
-          relative
-          z-10
-          mt-5
-          grid
-          grid-cols-2
-          gap-3
-        "
-      >
-        <InfoBox
-          icon={FileQuestion}
-          label="Questions"
-          value={totalQuestions}
-          premium={premium}
-        />
+        {/* INFO */}
 
-        <InfoBox
-          icon={Trophy}
-          label="Marks"
-          value={totalMark}
-          premium={premium}
-        />
-      </div>
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <InfoBox
+            icon={FileQuestion}
+            label="Questions"
+            value={totalQuestions}
+            premium={premium}
+          />
 
-      {/* BUTTON */}
+          <InfoBox
+            icon={Trophy}
+            label="Marks"
+            value={totalMark}
+            premium={premium}
+          />
+        </div>
 
-      <div
-        className="
-          relative
-          z-10
-          mt-auto
-          pt-5
-        "
-      >
-        <Link
-  href={{
-    pathname:
-      `/kerala-psc-coaching/mock-tests/${examId}`,
+        {/* ACTION */}
 
-    query: {
-      uid: String(uid),
-      cid: String(cid),
-      title: examName,
-    },
-  }}
-  className={`
-    inline-flex
-    w-full
-    items-center
-    justify-center
-    gap-2
-    rounded-[13px]
-    border
-    px-5
-    py-3.5
-    text-[11px]
-    font-extrabold
-    transition-all
-    duration-300
-    hover:-translate-y-0.5
+        <div className="mt-auto pt-5">
+          {premium ? (
+            <button
+              type="button"
+              onClick={openPremiumModal}
+              className="
+                inline-flex
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-[13px]
+                border
+                border-amber-200
+                bg-amber-100
+                px-5
+                py-3.5
+                text-[11px]
+                font-extrabold
+                text-amber-700
+              "
+            >
+              <LockKeyhole size={14} />
 
-    ${
-      premium
-        ? `
-            border-amber-200
-            bg-gradient-to-r
-            from-amber-100
-            via-orange-50
-            to-amber-100
-            text-amber-700
-            shadow-[0_8px_20px_rgba(245,158,11,0.10)]
-            hover:border-amber-300
-            hover:from-amber-200
-            hover:via-orange-100
-            hover:to-amber-200
-            hover:shadow-[0_12px_25px_rgba(245,158,11,0.16)]
-          `
-        : `
-            border-emerald-200
-            bg-gradient-to-r
-            from-emerald-100
-            via-green-50
-            to-teal-100
-            text-emerald-700
-            shadow-[0_8px_20px_rgba(16,185,129,0.10)]
-            hover:border-emerald-300
-            hover:from-emerald-200
-            hover:via-green-100
-            hover:to-teal-200
-            hover:shadow-[0_12px_25px_rgba(16,185,129,0.16)]
-          `
-    }
-  `}
->
-  {premium ? (
-    <LockKeyhole size={14} />
-  ) : (
-    <ArrowRight size={14} />
-  )}
+              Unlock Premium
+            </button>
+          ) : (
+            <Link
+              href={{
+                pathname:
+                  `/kerala-psc-coaching/mock-tests/${examId}`,
+                query: {
+                  uid: String(uid),
+                  cid: String(cid),
+                  title: examName,
+                },
+              }}
+              className="
+                inline-flex
+                w-full
+                items-center
+                justify-center
+                gap-2
+                rounded-[13px]
+                border
+                border-emerald-200
+                bg-emerald-100
+                px-5
+                py-3.5
+                text-[11px]
+                font-extrabold
+                text-emerald-700
+              "
+            >
+              Start Exam
 
-  View Mock Test
-</Link>
-      </div>
-    </article>
+              <ArrowRight size={14} />
+            </Link>
+          )}
+        </div>
+      </article>
+
+      {showPremiumModal && (
+        <div
+          className="
+            fixed
+            inset-0
+            z-[99999]
+            flex
+            items-center
+            justify-center
+            bg-black/60
+            p-4
+            backdrop-blur-sm
+          "
+          onClick={() =>
+            setShowPremiumModal(false)
+          }
+        >
+          <div
+            onClick={(event) =>
+              event.stopPropagation()
+            }
+            className="
+              relative
+              w-full
+              max-w-[420px]
+              rounded-[24px]
+              border
+              border-amber-200
+              bg-white
+              p-6
+              shadow-2xl
+            "
+          >
+            <button
+              type="button"
+              onClick={() =>
+                setShowPremiumModal(false)
+              }
+              className="
+                absolute
+                right-4
+                top-4
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-full
+                bg-slate-100
+              "
+            >
+              <X size={16} />
+            </button>
+
+            <div
+              className="
+                flex
+                h-14
+                w-14
+                items-center
+                justify-center
+                rounded-[16px]
+                bg-amber-100
+                text-amber-700
+              "
+            >
+              <Crown size={25} />
+            </div>
+
+            <h2
+              className="
+                mt-5
+                text-xl
+                font-black
+                text-[#0b1f44]
+              "
+            >
+              Premium plan required
+            </h2>
+
+            <p
+              className="
+                mt-2
+                text-[12px]
+                leading-6
+                text-slate-500
+              "
+            >
+              This mock test is available only
+              for premium users. Please log in
+              to continue.
+            </p>
+
+            <div
+              className="
+                mt-6
+                flex
+                justify-end
+                gap-2
+              "
+            >
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPremiumModal(false)
+                }
+                className="
+                  rounded-[12px]
+                  border
+                  border-slate-200
+                  px-4
+                  py-3
+                  text-[11px]
+                  font-bold
+                "
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={goToLogin}
+                className="
+                  rounded-[12px]
+                  bg-gradient-to-r
+                  from-amber-400
+                  to-orange-400
+                  px-5
+                  py-3
+                  text-[11px]
+                  font-black
+                  text-white
+                "
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
-
-/* =========================================================
-   INFO BOX
-========================================================= */
 
 function InfoBox({
   icon: Icon,
@@ -377,17 +426,10 @@ function InfoBox({
         border
         px-3
         py-3
-
         ${
           premium
-            ? `
-                border-amber-100
-                bg-amber-50/80
-              `
-            : `
-                border-emerald-100
-                bg-emerald-50/80
-              `
+            ? "border-amber-100 bg-amber-50"
+            : "border-emerald-100 bg-emerald-50"
         }
       `}
     >
@@ -399,41 +441,25 @@ function InfoBox({
           items-center
           justify-center
           rounded-[8px]
-
           ${
             premium
-              ? `
-                  bg-amber-100
-                  text-amber-700
-                `
-              : `
-                  bg-emerald-100
-                  text-emerald-700
-                `
+              ? "bg-amber-100 text-amber-700"
+              : "bg-emerald-100 text-emerald-700"
           }
         `}
       >
         <Icon size={14} />
       </div>
 
-      <p
-        className="
-          mt-2
-          text-[14px]
-          font-extrabold
-          text-[#0b1f44]
-        "
-      >
+      <p className="mt-2 font-extrabold text-[#0b1f44]">
         {value ?? "-"}
       </p>
 
       <p
         className="
-          mt-0.5
           text-[8px]
           font-bold
           uppercase
-          tracking-[0.06em]
           text-slate-400
         "
       >

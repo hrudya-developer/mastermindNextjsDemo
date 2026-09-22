@@ -16,6 +16,7 @@ export default function ScertInstructions({
   instructions = [],
   testSlug,
   classId,
+  examId,
 }) {
   const totalQuestions =
     Number(
@@ -32,6 +33,32 @@ export default function ScertInstructions({
       exam?.total_minutes
     ) || 90;
 
+  const examName =
+    exam?.exam_name ||
+    "SCERT Practice Test";
+
+  /* =========================================================
+     ROUTES
+  ========================================================= */
+
+  const backHref =
+    classId
+      ? `/kerala-psc-coaching/scert-tests/classes/${classId}`
+      : "/kerala-psc-coaching/scert-tests";
+
+  const startHref = {
+    pathname:
+      `/kerala-psc-coaching/scert-tests/tests/${testSlug}/start`,
+
+    query: {
+      classId:
+        String(classId),
+
+      examId:
+        String(examId),
+    },
+  };
+
   return (
     <>
       {/* =====================================================
@@ -39,7 +66,7 @@ export default function ScertInstructions({
       ====================================================== */}
 
       <Link
-        href={`/kerala-psc-coaching/scert-tests/classes/${classId}`}
+        href={backHref}
         className="
           inline-flex
           items-center
@@ -121,7 +148,12 @@ export default function ScertInstructions({
             "
           />
 
-          <div className="relative z-10">
+          <div
+            className="
+              relative
+              z-10
+            "
+          >
             <p
               className="
                 text-xs
@@ -144,8 +176,7 @@ export default function ScertInstructions({
                 sm:text-3xl
               "
             >
-              {exam?.exam_name ||
-                "SCERT Practice Test"}
+              {examName}
             </h1>
 
             {/* =============================================
@@ -197,7 +228,12 @@ export default function ScertInstructions({
             BODY
         ================================================= */}
 
-        <div className="p-6 sm:p-9">
+        <div
+          className="
+            p-6
+            sm:p-9
+          "
+        >
           {/* =============================================
               TITLE
           ============================================= */}
@@ -244,8 +280,9 @@ export default function ScertInstructions({
                   text-slate-500
                 "
               >
-                Please read the instructions
-                carefully before starting.
+                Please read the
+                instructions carefully
+                before starting.
               </p>
             </div>
           </div>
@@ -254,7 +291,12 @@ export default function ScertInstructions({
               API INSTRUCTIONS
           ============================================= */}
 
-          <div className="mt-6 space-y-3">
+          <div
+            className="
+              mt-6
+              space-y-3
+            "
+          >
             {instructions.length >
             0 ? (
               instructions.map(
@@ -263,7 +305,10 @@ export default function ScertInstructions({
                   index
                 ) => {
                   const text =
-                    item?.instructions;
+                    item?.instructions ||
+                    item?.instruction ||
+                    item?.title ||
+                    "";
 
                   if (!text) {
                     return null;
@@ -272,6 +317,7 @@ export default function ScertInstructions({
                   return (
                     <Instruction
                       key={
+                        item?.id ||
                         `${index}-${text}`
                       }
                     >
@@ -367,37 +413,46 @@ export default function ScertInstructions({
               START EXAM
           ============================================= */}
 
-          <Link
-            href={`/kerala-psc-coaching/scert-tests/tests/${testSlug}/start`}
+          <div
             className="
               mt-7
-              inline-flex
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              bg-gradient-to-r
-              from-[#071f55]
-              via-[#075fc8]
-              to-[#017dc0]
-              px-7
-              py-4
-              text-sm
-              font-bold
-              text-white
-              shadow-[0_12px_30px_rgba(7,95,200,0.24)]
-              transition-all
-              duration-300
-              hover:-translate-y-0.5
-              hover:shadow-[0_16px_36px_rgba(7,95,200,0.32)]
+              flex
+              justify-end
             "
           >
-            Start Exam
+            <Link
+              href={
+                startHref
+              }
+              className="
+                inline-flex
+                items-center
+                justify-center
+                gap-2
+                rounded-xl
+                bg-gradient-to-r
+                from-[#071f55]
+                via-[#075fc8]
+                to-[#017dc0]
+                px-7
+                py-4
+                text-sm
+                font-bold
+                text-white
+                shadow-[0_12px_30px_rgba(7,95,200,0.24)]
+                transition-all
+                duration-300
+                hover:-translate-y-0.5
+                hover:shadow-[0_16px_36px_rgba(7,95,200,0.32)]
+              "
+            >
+              Start Exam
 
-            <ArrowRight
-              size={18}
-            />
-          </Link>
+              <ArrowRight
+                size={18}
+              />
+            </Link>
+          </div>
         </div>
       </section>
     </>

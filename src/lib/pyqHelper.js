@@ -1,6 +1,7 @@
 export async function getPreviousQuestions({
   uid,
   cid,
+  subId,
   offset,
   type,
   filter,
@@ -24,6 +25,13 @@ export async function getPreviousQuestions({
       formData.append(
         "cid",
         String(cid)
+      );
+    }
+
+    if (subId != null) {
+      formData.append(
+        "subid",
+        String(subId)
       );
     }
 
@@ -75,6 +83,7 @@ export async function getPreviousQuestions({
 
       nextOffset:
         result?.nextoffset ??
+        result?.nextOffset ??
         null,
 
       data:

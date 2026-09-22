@@ -9,9 +9,15 @@ export async function GET() {
       process.env.PSC_API_KEY;
 
     if (!apiBaseUrl || !apiKey) {
+      console.error(
+        "PSC API configuration is missing."
+      );
+
       return NextResponse.json(
         {
           status: false,
+          file_path: "",
+          data: [],
           message:
             "PSC API configuration is missing.",
         },
@@ -21,29 +27,121 @@ export async function GET() {
       );
     }
 
-    const url =
-      `${apiBaseUrl}/getCourses?api=${encodeURIComponent(
-        apiKey
-      )}`;
+    const baseUrl =
+      apiBaseUrl.replace(
+        /\/+$/,
+        ""
+      );
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-store",
-    });
+    const formData =
+      new FormData();
 
-    if (!response.ok) {
-      throw new Error(
-        `PSC API failed with status ${response.status}`
+    formData.append(
+      "api",
+      apiKey
+    );
+
+    formData.append(
+      "cid",
+      "1"
+    );
+
+    formData.append(
+      "uid",
+      "0"
+    );
+
+    const response =
+      await fetch(
+        `${baseUrl}/getCourses`,
+        {
+          method: "POST",
+          body: formData,
+          cache: "no-store",
+        }
+      );
+
+    const text =
+      await response.text();
+
+    let result = null;
+
+    try {
+      result = text
+        ? JSON.parse(text)
+        : null;
+    } catch (error) {
+      console.error(
+        "getCourses returned invalid JSON:",
+        text
+      );
+
+      return NextResponse.json(
+        {
+          status: false,
+          file_path: "",
+          data: [],
+          message:
+            "PSC getCourses API returned invalid JSON.",
+        },
+        {
+          status: 502,
+        }
       );
     }
 
-    const result =
-      await response.json();
+    if (!response.ok) {
+      console.error(
+        "getCourses upstream error:",
+        {
+          status:
+            response.status,
+          result,
+        }
+      );
 
-    return NextResponse.json(result);
+      return NextResponse.json(
+        {
+          status: false,
+          file_path: "",
+          data: [],
+          message:
+            result?.message ||
+            `PSC API failed with status ${response.status}`,
+        },
+        {
+          status:
+            response.status,
+        }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        status:
+          result?.status ??
+          true,
+
+        file_path:
+          result?.file_path ||
+          result?.icon_path ||
+          "",
+
+        data:
+          Array.isArray(
+            result?.data
+          )
+            ? result.data
+            : [],
+
+        message:
+          result?.message ||
+          "",
+      },
+      {
+        status: 200,
+      }
+    );
   } catch (error) {
     console.error(
       "Main courses API error:",
@@ -56,6 +154,7 @@ export async function GET() {
         file_path: "",
         data: [],
         message:
+          error?.message ||
           "Unable to fetch main courses.",
       },
       {

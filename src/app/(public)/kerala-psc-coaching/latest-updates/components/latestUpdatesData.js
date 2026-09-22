@@ -8,7 +8,7 @@ export const latestUpdates = [
   {
     title: "Current Affairs",
     subtitle: "Daily Updates & News",
-    href: "/current-affairs",
+    href: "/kerala-psc-coaching/current-affairs",
     icon: FileText,
     iconBg: "bg-[#dff0ff]",
     iconColor: "text-[#087bea]",
@@ -17,7 +17,7 @@ export const latestUpdates = [
   {
     title: "Mock Test",
     subtitle: "Practice Exams & Tests",
-    href: "/mock-tests",
+    href: "/kerala-psc-coaching/mock-tests",
     icon: ClipboardList,
     iconBg: "bg-[#ffe1f0]",
     iconColor: "text-[#f13873]",
@@ -26,7 +26,7 @@ export const latestUpdates = [
   {
     title: "Exam Syllabus",
     subtitle: "Kerala PSC Syllabus",
-    href: "/exam-syllabus",
+    href: "/kerala-psc-coaching/exam-syllabus",
     icon: BookOpenCheck,
     iconBg: "bg-[#e8f7ef]",
     iconColor: "text-[#16824f]",

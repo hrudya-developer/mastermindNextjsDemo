@@ -19,7 +19,7 @@ const courseContent = {
   },
 
   2: {
-    href: "/main-courses/rrb-ssc",
+    href: "/rrb-ssc-exams-coaching",
     points: [
       "Comprehensive Study Notes",
       "Previous Year Questions",

@@ -1,24 +1,82 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import {
+  createSlug,
+} from "@/lib/pscSlug";
+
 export default function SubExamCard({
   exam,
 }) {
+  if (!exam?.id) {
+    return null;
+  }
+
   const examName =
     exam?.exam ||
     exam?.name ||
     "Mastermind PSC Exam";
 
+  const categoryId =
+    exam?.categoryId ||
+    exam?.sub_id ||
+    null;
+
+  const categoryName =
+    exam?.categoryName ||
+    exam?.subcourse ||
+    "";
+
+  if (
+    !categoryId ||
+    !categoryName
+  ) {
+    return null;
+  }
+
+  const categorySlug =
+    createSlug(
+      categoryName
+    );
+
+  const examSlug =
+    createSlug(
+      examName
+    );
+
+  const href = {
+    pathname:
+      `/kerala-psc-coaching/sub-courses/${categorySlug}/${examSlug}`,
+
+    query: {
+      cid:
+        String(
+          exam?.cid ||
+          1
+        ),
+
+      subId:
+        String(
+          categoryId
+        ),
+
+      examId:
+        String(
+          exam.id
+        ),
+    },
+  };
+
   return (
     <Link
-      href={`/kerala-psc-coaching/sub-exams/${exam?.id}`}
+      href={href}
       aria-label={examName}
       className="
         group
         relative
         block
         h-full
-        min-h-0
+        min-h-[160px]
         w-full
         overflow-hidden
         rounded-[20px]
@@ -31,13 +89,11 @@ export default function SubExamCard({
         shadow-[0_8px_24px_rgba(11,33,108,0.06)]
         transition
         duration-300
-
         hover:-translate-y-1
         hover:border-[#164fa5]/20
         hover:shadow-[0_16px_34px_rgba(22,79,165,0.12)]
       "
     >
-      {/* TOP GRADIENT */}
       <div
         aria-hidden="true"
         className="
@@ -53,99 +109,6 @@ export default function SubExamCard({
         "
       />
 
-      {/* LEFT DOTS */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          left-4
-          top-1/2
-          z-10
-          grid
-          -translate-y-1/2
-          grid-cols-4
-          gap-2
-          opacity-40
-        "
-      >
-        {Array.from({
-          length: 16,
-        }).map((_, index) => (
-          <span
-            key={index}
-            className="
-              h-1.5
-              w-1.5
-              rounded-full
-              bg-[#00b5e8]/60
-            "
-          />
-        ))}
-      </div>
-
-      {/* RIGHT DOTS */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          right-4
-          top-1/2
-          z-10
-          grid
-          -translate-y-1/2
-          grid-cols-4
-          gap-2
-          opacity-30
-        "
-      >
-        {Array.from({
-          length: 16,
-        }).map((_, index) => (
-          <span
-            key={index}
-            className="
-              h-1.5
-              w-1.5
-              rounded-full
-              bg-[#164fa5]/50
-            "
-          />
-        ))}
-      </div>
-
-      {/* LEFT DECORATION */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -bottom-8
-          -left-10
-          h-28
-          w-28
-          rounded-full
-          bg-[#00b5e8]/8
-        "
-      />
-
-      {/* RIGHT DECORATION */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
-          -right-10
-          -top-7
-          h-28
-          w-28
-          rounded-full
-          bg-[#164fa5]/7
-        "
-      />
-
-      {/* IMAGE */}
       <div
         className="
           absolute

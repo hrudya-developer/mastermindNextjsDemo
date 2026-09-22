@@ -18,18 +18,23 @@ import {
   createSlug,
 } from "@/lib/pscSlug";
 
+import SubCategoryCourses from "./components/SubCategoryCourses";
+
 const PAGE_COURSE_SLUG =
   "kerala-psc";
 
 /* =========================================================
-   IMAGE
+   IMAGE URL
 ========================================================= */
 
 function buildImageUrl(
   filePath,
   image
 ) {
-  if (!filePath || !image) {
+  if (
+    !filePath ||
+    !image
+  ) {
     return "";
   }
 
@@ -41,14 +46,15 @@ function buildImageUrl(
 }
 
 /* =========================================================
-   RESOLVE KERALA PSC
+   KERALA PSC COURSE
 ========================================================= */
 
 async function resolveKeralaPscCourse() {
   try {
     const {
       courses,
-    } = await getMainCourses();
+    } =
+      await getMainCourses();
 
     return (
       courses.find(
@@ -71,7 +77,7 @@ async function resolveKeralaPscCourse() {
 }
 
 /* =========================================================
-   RESOLVE SUBCATEGORY
+   SUB CATEGORY / LEVEL
 ========================================================= */
 
 async function resolveSubCategory(
@@ -90,7 +96,9 @@ async function resolveSubCategory(
       filePath,
     } =
       await getSubCategories({
-        cid: course.id,
+        cid:
+          course.id,
+
         uid: 0,
       });
 
@@ -98,7 +106,8 @@ async function resolveSubCategory(
       categories.find(
         (item) =>
           createSlug(
-            item?.name || ""
+            item?.name ||
+              ""
           ) ===
           createSlug(
             subCategorySlug
@@ -125,7 +134,7 @@ async function resolveSubCategory(
 }
 
 /* =========================================================
-   SEO
+   METADATA
 ========================================================= */
 
 export async function generateMetadata({
@@ -143,7 +152,7 @@ export async function generateMetadata({
   if (!resolved) {
     return {
       title:
-        "Exam Not Found",
+        "Exam Level Not Found",
 
       robots: {
         index: false,
@@ -152,24 +161,22 @@ export async function generateMetadata({
     };
   }
 
-  const {
-    subCategory,
-  } = resolved;
-
   const title =
-    subCategory?.name ||
-    "Kerala PSC Exam";
+    resolved
+      ?.subCategory
+      ?.name ||
+    "Kerala PSC";
 
   return {
     title:
-      `${title} Kerala PSC Preparation | MasterMind PSC`,
+      `${title} Courses | MasterMind Academy`,
 
     description:
-      `Prepare for ${title} under Kerala PSC with study materials, mock tests, previous questions and exam preparation resources.`,
+      `Explore Kerala PSC courses available under ${title}.`,
 
     alternates: {
       canonical:
-        `/kerala-psc-coaching/${createSlug(
+        `/kerala-psc-coaching/sub-courses/${createSlug(
           title
         )}`,
     },
@@ -203,10 +210,12 @@ export default async function SubCategoryPage({
   } = resolved;
 
   /*
-   * THIS is the real subcategory ID
-   * from your API.
+   * THIS is the level/subcategory ID.
    *
-   * Keep it internal for the next API.
+   * Example:
+   * 10th Level -> id 3
+   *
+   * This ID is what your sub-exam/course API needs.
    */
   const subCategoryId =
     subCategory.id;
@@ -222,28 +231,31 @@ export default async function SubCategoryPage({
     <main
       className="
         min-h-screen
-        bg-[#f6f9fd]
-        py-8
+        bg-[#f4f9ff]
+        pb-14
+        pt-[100px]
+        lg:pt-[115px]
       "
     >
-      <section
+      <div
         className="
           mx-auto
           w-full
-          max-w-[1500px]
+          max-w-[1450px]
           px-4
-
           sm:px-6
           lg:px-8
         "
       >
+        {/* BACK */}
+
         <Link
           href="/kerala-psc-coaching"
           className="
             inline-flex
             items-center
             gap-2
-            text-sm
+            text-[12px]
             font-bold
             text-[#164fa5]
             transition
@@ -254,35 +266,44 @@ export default async function SubCategoryPage({
             size={16}
           />
 
-          Back to {course.exam}
+          Back to Kerala PSC
         </Link>
 
-        <div
+        {/* ===============================================
+            HERO
+        =============================================== */}
+
+        <section
           className="
             relative
             mt-5
-            min-h-[380px]
+            min-h-[300px]
             overflow-hidden
             rounded-[28px]
-            bg-[#0b216c]
-            shadow-[0_20px_55px_rgba(11,33,108,0.14)]
+            bg-gradient-to-r
+            from-[#071f55]
+            via-[#075fc8]
+            to-[#7c3aed]
+            shadow-[0_20px_55px_rgba(11,33,108,0.15)]
           "
         >
-          {imageUrl && (
+          {imageUrl ? (
             <Image
               src={imageUrl}
               alt={
-                subCategory.name
+                subCategory?.name ||
+                "Kerala PSC"
               }
               fill
               priority
               sizes="100vw"
               className="
                 object-cover
+                opacity-35
               "
               unoptimized
             />
-          )}
+          ) : null}
 
           <div
             aria-hidden="true"
@@ -290,9 +311,20 @@ export default async function SubCategoryPage({
               absolute
               inset-0
               bg-gradient-to-r
-              from-[#081f5c]/95
-              via-[#0b216c]/70
-              to-[#0b216c]/10
+              from-[#071f55]/95
+              via-[#075fc8]/80
+              to-[#7c3aed]/65
+            "
+          />
+
+          <div
+            aria-hidden="true"
+            className="
+              absolute
+              inset-0
+              opacity-[0.06]
+              [background-image:linear-gradient(to_right,#ffffff_1px,transparent_1px),linear-gradient(to_bottom,#ffffff_1px,transparent_1px)]
+              [background-size:34px_34px]
             "
           />
 
@@ -301,55 +333,58 @@ export default async function SubCategoryPage({
               relative
               z-10
               flex
-              min-h-[380px]
+              min-h-[300px]
               max-w-3xl
               flex-col
               justify-center
               px-6
               py-10
-
               sm:px-10
-
               lg:px-14
             "
           >
             <p
               className="
                 text-[10px]
-                font-extrabold
+                font-black
                 uppercase
-                tracking-[0.22em]
-                text-[#64dcff]
+                tracking-[0.18em]
+                text-[#8ee8ff]
               "
             >
-              {course.exam}
+              {course?.exam ||
+                "Kerala PSC"}
             </p>
 
             <h1
               className="
                 mt-3
-                text-4xl
+                text-3xl
                 font-black
-                tracking-[-0.04em]
+                tracking-[-0.03em]
                 text-white
-
-                sm:text-5xl
+                sm:text-4xl
+                lg:text-5xl
               "
             >
               {subCategory.name}
             </h1>
 
-            {subCategory?.name_mal && (
+            {subCategory
+              ?.name_mal ? (
               <p
                 className="
-                  mt-3
+                  mt-2
                   text-sm
-                  text-white/65
+                  text-white/70
                 "
               >
-                {subCategory.name_mal}
+                {
+                  subCategory
+                    .name_mal
+                }
               </p>
-            )}
+            ) : null}
 
             <p
               className="
@@ -360,28 +395,32 @@ export default async function SubCategoryPage({
                 text-white/75
               "
             >
-              Explore preparation resources,
-              study materials, practice tests
-              and exam-focused learning for{" "}
-              {subCategory.name}.
+              Choose a course under{" "}
+              {subCategory.name}{" "}
+              and access video
+              classes, mock tests,
+              previous questions and
+              SCERT practice.
             </p>
-
-            {/*
-              IMPORTANT:
-
-              subCategoryId is now available:
-
-              const subCategoryId =
-                subCategory.id;
-
-              Use this ID for your NEXT API:
-              subjects / courses / tests etc.
-
-              Do NOT put it in the URL.
-            */}
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* ===============================================
+            COURSES UNDER THIS LEVEL
+        =============================================== */}
+
+        <SubCategoryCourses
+          cid={
+            course.id
+          }
+          subId={
+            subCategoryId
+          }
+          subCategorySlug={
+            subCategorySlug
+          }
+        />
+      </div>
     </main>
   );
 }

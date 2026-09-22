@@ -20,7 +20,8 @@ import LatestUpdatesSection from "./latest-updates/components/LatestUpdatesSecti
 import KPSCFAQ from "./faq/KPSCFAQ";
 import CompetitiveExamPacks from "./competitive-exam-packs/CompetitiveExamPacks";
 import AIShortVideos from "./ai-short-videos/components/AIShortVideos";
-import SubExamSection from "./recommeded-courses/[recommendedCoursesSlug.js]/components/SubExamSection";
+import SubExamSection from "./recommeded-courses/[recommendedCoursesSlug]/components/SubExamSection";
+
 
 /*
  * This identifies which API course belongs

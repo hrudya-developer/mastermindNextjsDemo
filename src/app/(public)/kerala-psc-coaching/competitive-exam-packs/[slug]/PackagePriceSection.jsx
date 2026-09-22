@@ -11,11 +11,40 @@ import {
 import PriceInfo from "./PriceInfo";
 
 export default function PackagePriceSection({
-  prices = [],
+  price,
 }) {
-  if (!prices.length) {
+  if (!price) {
     return null;
   }
+
+  const currentPrice =
+    Number(
+      price?.current || 0
+    );
+
+  const originalPrice =
+    Number(
+      price?.original || 0
+    );
+
+  const saving =
+    originalPrice >
+    currentPrice
+      ? originalPrice -
+        currentPrice
+      : 0;
+
+  const discount =
+    originalPrice >
+      currentPrice &&
+    originalPrice > 0
+      ? Math.round(
+          ((originalPrice -
+            currentPrice) /
+            originalPrice) *
+            100
+        )
+      : 0;
 
   return (
     <section
@@ -35,7 +64,8 @@ export default function PackagePriceSection({
         sm:p-8
       "
     >
-      {/* Decorative glows */}
+      {/* BACKGROUND */}
+
       <div
         aria-hidden="true"
         className="
@@ -56,22 +86,6 @@ export default function PackagePriceSection({
         className="
           pointer-events-none
           absolute
-          -bottom-24
-          left-1/3
-          h-64
-          w-64
-          rounded-full
-          bg-[#f13873]/10
-          blur-[90px]
-        "
-      />
-
-      {/* subtle grid */}
-      <div
-        aria-hidden="true"
-        className="
-          pointer-events-none
-          absolute
           inset-0
           opacity-[0.025]
           [background-image:linear-gradient(#164fa5_1px,transparent_1px),linear-gradient(90deg,#164fa5_1px,transparent_1px)]
@@ -80,13 +94,16 @@ export default function PackagePriceSection({
       />
 
       <div className="relative z-10">
-        {/* Header */}
+        {/* HEADER */}
+
         <div
           className="
             flex
-            items-center
-            justify-between
+            flex-col
             gap-4
+            sm:flex-row
+            sm:items-center
+            sm:justify-between
           "
         >
           <div className="flex items-center gap-3">
@@ -105,7 +122,9 @@ export default function PackagePriceSection({
                 shadow-[0_10px_25px_rgba(22,79,165,0.25)]
               "
             >
-              <WalletCards className="h-6 w-6" />
+              <WalletCards
+                size={23}
+              />
             </div>
 
             <div>
@@ -135,272 +154,270 @@ export default function PackagePriceSection({
             </div>
           </div>
 
-          <div
-            className="
-              hidden
-              items-center
-              gap-2
-              rounded-full
-              border
-              border-[#f13873]/15
-              bg-[#fff0f5]
-              px-3
-              py-1.5
-              text-[10px]
-              font-bold
-              uppercase
-              tracking-[0.08em]
-              text-[#d92f67]
-              sm:inline-flex
-            "
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            Best Value
-          </div>
+          {discount > 0 && (
+            <div
+              className="
+                inline-flex
+                w-fit
+                items-center
+                gap-2
+                rounded-full
+                bg-[#fff0f5]
+                px-3
+                py-2
+                text-[10px]
+                font-black
+                text-[#d92f67]
+              "
+            >
+              <Sparkles
+                size={14}
+              />
+
+              {discount}% OFF
+            </div>
+          )}
         </div>
 
-        {/* Price cards */}
-        <div className="mt-7 grid gap-5">
-          {prices.map((price, index) => {
-            const actualPrice =
-              Number(price?.price || 0);
+        {/* MAIN PRICE */}
 
-            const oldPrice =
-              Number(price?.strikedPrice || 0);
-
-            const saving =
-              oldPrice > actualPrice
-                ? oldPrice - actualPrice
-                : 0;
-
-            return (
-              <div
-                key={index}
+        <div
+          className="
+            mt-7
+            rounded-[24px]
+            border
+            border-[#dce8f4]
+            bg-white
+            p-5
+            shadow-[0_12px_30px_rgba(15,58,110,0.06)]
+            sm:p-6
+          "
+        >
+          <div
+            className="
+              flex
+              flex-col
+              gap-5
+              lg:flex-row
+              lg:items-center
+              lg:justify-between
+            "
+          >
+            <div>
+              <p
                 className="
-                  relative
-                  overflow-hidden
-                  rounded-[24px]
-                  border
-                  border-[#dce8f4]
-                  bg-white
-                  p-5
-                  shadow-[0_12px_30px_rgba(15,58,110,0.06)]
-                  sm:p-6
+                  text-[10px]
+                  font-bold
+                  uppercase
+                  tracking-[0.12em]
+                  text-[#7a8ba4]
                 "
               >
-                {/* top accent */}
-                <div
-                  aria-hidden="true"
-                  className="
-                    absolute
-                    inset-x-0
-                    top-0
-                    h-[4px]
-                    bg-gradient-to-r
-                    from-[#164fa5]
-                    via-[#00b5e8]
-                    to-[#f13873]
-                  "
-                />
+                Package Price
+              </p>
 
-                {/* price row */}
+              <div
+                className="
+                  mt-2
+                  flex
+                  flex-wrap
+                  items-center
+                  gap-3
+                "
+              >
                 <div
                   className="
                     flex
-                    flex-col
-                    gap-5
-                    lg:flex-row
-                    lg:items-center
-                    lg:justify-between
+                    items-center
+                    text-[36px]
+                    font-black
+                    leading-none
+                    tracking-[-0.04em]
+                    text-[#0b216c]
                   "
                 >
-                  <div>
-                    <p
-                      className="
-                        text-[10px]
-                        font-bold
-                        uppercase
-                        tracking-[0.12em]
-                        text-[#7a8ba4]
-                      "
-                    >
-                      Package Price
-                    </p>
-
-                    <div
-                      className="
-                        mt-2
-                        flex
-                        flex-wrap
-                        items-end
-                        gap-3
-                      "
-                    >
-                      <div
-                        className="
-                          flex
-                          items-center
-                          text-[36px]
-                          font-black
-                          leading-none
-                          tracking-[-0.04em]
-                          text-[#0b216c]
-                        "
-                      >
-                        <IndianRupee className="h-7 w-7" />
-                        {price.price}
-                      </div>
-
-                      {price.strikedPrice && (
-                        <span
-                          className="
-                            pb-1
-                            text-[15px]
-                            font-semibold
-                            text-slate-400
-                            line-through
-                          "
-                        >
-                          ₹{price.strikedPrice}
-                        </span>
-                      )}
-                    </div>
-
-                    {saving > 0 && (
-                      <div
-                        className="
-                          mt-3
-                          inline-flex
-                          items-center
-                          gap-2
-                          rounded-full
-                          bg-[#ecfbf3]
-                          px-3
-                          py-1.5
-                          text-[11px]
-                          font-bold
-                          text-[#16824f]
-                        "
-                      >
-                        Save ₹{saving}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* pink highlight */}
-                  <div
+                  <IndianRupee
                     className="
-                      rounded-[18px]
-                      border
-                      border-[#f13873]/15
-                      bg-gradient-to-br
-                      from-[#fff5f8]
-                      to-[#fff]
-                      px-5
-                      py-4
-                      lg:min-w-[190px]
+                      h-7
+                      w-7
+                    "
+                  />
+
+                  {price?.current}
+                </div>
+
+                {originalPrice >
+                  currentPrice && (
+                  <span
+                    className="
+                      text-[15px]
+                      font-semibold
+                      text-slate-400
+                      line-through
                     "
                   >
-                    <p
-                      className="
-                        text-[10px]
-                        font-bold
-                        uppercase
-                        tracking-[0.12em]
-                        text-[#d92f67]
-                      "
-                    >
-                      Final Payable
-                    </p>
+                    ₹
+                    {
+                      price?.original
+                    }
+                  </span>
+                )}
 
-                    <p
-                      className="
-                        mt-1
-                        text-2xl
-                        font-black
-                        text-[#0b216c]
-                      "
-                    >
-                      ₹
-                      {price.finalPrice ||
-                        price.price}
-                    </p>
-                  </div>
-                </div>
+                {discount >
+                  0 && (
+                  <span
+                    className="
+                      rounded-full
+                      bg-[#f13873]
+                      px-3
+                      py-1.5
+                      text-[10px]
+                      font-black
+                      text-white
+                    "
+                  >
+                    {discount}% OFF
+                  </span>
+                )}
+              </div>
 
-                {/* details */}
-                <div
+              {saving > 0 && (
+                <p
                   className="
-                    mt-6
-                    grid
-                    gap-4
-                    sm:grid-cols-2
-                    lg:grid-cols-3
-                    xl:grid-cols-5
+                    mt-3
+                    text-[12px]
+                    font-bold
+                    text-[#16824f]
                   "
                 >
-                  <PriceInfo
-                    label="Subtotal"
-                    value={
-                      price.subtotal
-                        ? `₹${price.subtotal}`
-                        : "-"
-                    }
-                    icon={
-                      <ReceiptText className="h-5 w-5" />
-                    }
-                    tone="blue"
-                  />
+                  You save ₹
+                  {saving}
+                </p>
+              )}
+            </div>
 
-                  <PriceInfo
-                    label="GST"
-                    value={`${price.gst || "0"}%`}
-                    icon={
-                      <Percent className="h-5 w-5" />
-                    }
-                    tone="pink"
-                  />
+            {/* FINAL PRICE */}
 
-                  <PriceInfo
-                    label="Final Price"
-                    value={
-                      price.finalPrice
-                        ? `₹${price.finalPrice}`
-                        : "-"
-                    }
-                    icon={
-                      <IndianRupee className="h-5 w-5" />
-                    }
-                    tone="cyan"
-                  />
+            <div
+              className="
+                rounded-[18px]
+                border
+                border-[#f13873]/15
+                bg-gradient-to-br
+                from-[#fff5f8]
+                to-white
+                px-5
+                py-4
+                lg:min-w-[190px]
+              "
+            >
+              <p
+                className="
+                  text-[10px]
+                  font-bold
+                  uppercase
+                  tracking-[0.12em]
+                  text-[#d92f67]
+                "
+              >
+                Final Payable
+              </p>
 
-                  <PriceInfo
-                    label="Validity"
-                    value={
-                      price.validity || "-"
-                    }
-                    icon={
-                      <CalendarDays className="h-5 w-5" />
-                    }
-                    tone="violet"
-                  />
+              <p
+                className="
+                  mt-1
+                  text-2xl
+                  font-black
+                  text-[#0b216c]
+                "
+              >
+                ₹
+                {
+                  price?.final
+                }
+              </p>
+            </div>
+          </div>
 
-                  <PriceInfo
-                    label="Duration"
-                    value={
-                      price.days
-                        ? `${price.days} Days`
-                        : "-"
-                    }
-                    icon={
-                      <Clock3 className="h-5 w-5" />
-                    }
-                    tone="green"
-                  />
-                </div>
-              </div>
-            );
-          })}
+          {/* DETAILS */}
+
+          <div
+            className="
+              mt-6
+              grid
+              gap-4
+              sm:grid-cols-2
+              lg:grid-cols-3
+              xl:grid-cols-5
+            "
+          >
+            <PriceInfo
+              label="Subtotal"
+              value={
+                price?.subtotal
+                  ? `₹${price.subtotal}`
+                  : "-"
+              }
+              icon={
+                <ReceiptText
+                  size={20}
+                />
+              }
+            />
+
+            <PriceInfo
+              label="GST"
+              value={
+                `${price?.gst || 0}%`
+              }
+              icon={
+                <Percent
+                  size={20}
+                />
+              }
+            />
+
+            <PriceInfo
+              label="Final Price"
+              value={
+                price?.final
+                  ? `₹${price.final}`
+                  : "-"
+              }
+              icon={
+                <IndianRupee
+                  size={20}
+                />
+              }
+            />
+
+            <PriceInfo
+              label="Validity"
+              value={
+                price?.validity ||
+                "-"
+              }
+              icon={
+                <CalendarDays
+                  size={20}
+                />
+              }
+            />
+
+            <PriceInfo
+              label="Duration"
+              value={
+                price?.days
+                  ? `${price.days} Days`
+                  : "-"
+              }
+              icon={
+                <Clock3
+                  size={20}
+                />
+              }
+            />
+          </div>
         </div>
       </div>
     </section>

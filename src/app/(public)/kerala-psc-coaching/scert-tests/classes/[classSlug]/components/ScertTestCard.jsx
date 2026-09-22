@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useState,
+} from "react";
+
 import Link from "next/link";
 
 import {
@@ -12,47 +15,44 @@ import {
   Trophy,
 } from "lucide-react";
 
-/* =========================================================
-   CREATE SEO FRIENDLY SLUG
-========================================================= */
-
-function createSlug(value = "") {
+function createSlug(
+  value = ""
+) {
   return String(value)
     .toLowerCase()
     .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(
+      /[^a-z0-9]+/g,
+      "-"
+    )
+    .replace(
+      /^-+|-+$/g,
+      ""
+    );
 }
-
-/* =========================================================
-   SCERT TEST CARD
-========================================================= */
 
 export default function ScertTestCard({
   test,
+  classId,
 }) {
   const [
     showPremiumModal,
     setShowPremiumModal,
   ] = useState(false);
 
-  if (!test) {
+  if (!test?.id) {
     return null;
   }
 
-  /* =========================================================
-     ACCESS TYPE
-  ========================================================= */
+  const examId =
+    test.id;
 
   const isPaid =
     String(
       test?.access || ""
-    ).toLowerCase() ===
-    "paid";
-
-  /* =========================================================
-     SEO FRIENDLY TEST SLUG
-  ========================================================= */
+    )
+      .toLowerCase()
+      .trim() === "paid";
 
   const testSlug =
     createSlug(
@@ -60,68 +60,17 @@ export default function ScertTestCard({
         "scert-practice-test"
     );
 
-  const examHref =
-    `/kerala-psc-coaching/scert-tests/tests/${testSlug}`;
+  const examHref = {
+    pathname:
+      `/kerala-psc-coaching/scert-tests/tests/${testSlug}`,
 
-  /* =========================================================
-     THEME
-  ========================================================= */
-
-  const cardTheme =
-    isPaid
-      ? `
-        border-amber-200
-        bg-gradient-to-br
-        from-amber-50
-        via-[#fffaf0]
-        to-white
-        hover:border-amber-300
-        hover:shadow-[0_20px_45px_rgba(217,119,6,0.12)]
-      `
-      : `
-        border-emerald-200
-        bg-gradient-to-br
-        from-emerald-50
-        via-[#f3fff8]
-        to-white
-        hover:border-emerald-300
-        hover:shadow-[0_20px_45px_rgba(16,185,129,0.12)]
-      `;
-
-  const iconTheme =
-    isPaid
-      ? `
-        bg-gradient-to-br
-        from-amber-100
-        to-amber-50
-        text-amber-700
-      `
-      : `
-        bg-gradient-to-br
-        from-emerald-100
-        to-green-50
-        text-emerald-700
-      `;
-
-  const labelTheme =
-    isPaid
-      ? "text-amber-700"
-      : "text-emerald-700";
-
-  const statTheme =
-    isPaid
-      ? `
-        border-amber-100
-        bg-white/75
-      `
-      : `
-        border-emerald-100
-        bg-white/75
-      `;
-
-  /* =========================================================
-     RENDER
-  ========================================================= */
+    query: {
+      classId:
+        String(classId),
+      examId:
+        String(examId),
+    },
+  };
 
   return (
     <>
@@ -140,13 +89,29 @@ export default function ScertTestCard({
           duration-300
           hover:-translate-y-1
 
-          ${cardTheme}
+          ${
+            isPaid
+              ? `
+                  border-amber-200
+                  bg-gradient-to-br
+                  from-amber-50
+                  via-[#fffaf0]
+                  to-white
+                  hover:border-amber-300
+                  hover:shadow-[0_20px_45px_rgba(217,119,6,0.12)]
+                `
+              : `
+                  border-emerald-200
+                  bg-gradient-to-br
+                  from-emerald-50
+                  via-[#f3fff8]
+                  to-white
+                  hover:border-emerald-300
+                  hover:shadow-[0_20px_45px_rgba(16,185,129,0.12)]
+                `
+          }
         `}
       >
-        {/* =================================================
-            TOP
-        ================================================= */}
-
         <div
           className="
             flex
@@ -164,7 +129,11 @@ export default function ScertTestCard({
               justify-center
               rounded-xl
 
-              ${iconTheme}
+              ${
+                isPaid
+                  ? "bg-amber-100 text-amber-700"
+                  : "bg-emerald-100 text-emerald-700"
+              }
             `}
           >
             {isPaid ? (
@@ -192,16 +161,8 @@ export default function ScertTestCard({
 
               ${
                 isPaid
-                  ? `
-                    border-amber-200
-                    bg-amber-100
-                    text-amber-800
-                  `
-                  : `
-                    border-emerald-200
-                    bg-emerald-100
-                    text-emerald-800
-                  `
+                  ? "border-amber-200 bg-amber-100 text-amber-800"
+                  : "border-emerald-200 bg-emerald-100 text-emerald-800"
               }
             `}
           >
@@ -210,7 +171,6 @@ export default function ScertTestCard({
                 <Crown
                   size={13}
                 />
-
                 Premium
               </>
             ) : (
@@ -218,10 +178,6 @@ export default function ScertTestCard({
             )}
           </span>
         </div>
-
-        {/* =================================================
-            TEST INFORMATION
-        ================================================= */}
 
         <div className="mt-5">
           <p
@@ -231,7 +187,11 @@ export default function ScertTestCard({
               uppercase
               tracking-[0.14em]
 
-              ${labelTheme}
+              ${
+                isPaid
+                  ? "text-amber-700"
+                  : "text-emerald-700"
+              }
             `}
           >
             {test?.subcourse ||
@@ -265,10 +225,6 @@ export default function ScertTestCard({
           ) : null}
         </div>
 
-        {/* =================================================
-            TEST STATS
-        ================================================= */}
-
         <div
           className="
             mt-5
@@ -277,98 +233,31 @@ export default function ScertTestCard({
             gap-3
           "
         >
-          {/* QUESTIONS */}
+          <StatBox
+            icon={FileQuestion}
+            label="Questions"
+            value={
+              test?.total_questions
+            }
+            isPaid={isPaid}
+          />
 
-          <div
-            className={`
-              rounded-xl
-              border
-              p-3
-
-              ${statTheme}
-            `}
-          >
-            <FileQuestion
-              size={16}
-              className={
-                isPaid
-                  ? "text-amber-600"
-                  : "text-emerald-600"
-              }
-            />
-
-            <p
-              className="
-                mt-2
-                text-[10px]
-                text-slate-400
-              "
-            >
-              Questions
-            </p>
-
-            <p
-              className="
-                mt-0.5
-                text-sm
-                font-black
-                text-slate-700
-              "
-            >
-              {test?.total_questions ||
-                0}
-            </p>
-          </div>
-
-          {/* MARKS */}
-
-          <div
-            className={`
-              rounded-xl
-              border
-              p-3
-
-              ${statTheme}
-            `}
-          >
-            <Trophy
-              size={16}
-              className={
-                isPaid
-                  ? "text-amber-600"
-                  : "text-emerald-600"
-              }
-            />
-
-            <p
-              className="
-                mt-2
-                text-[10px]
-                text-slate-400
-              "
-            >
-              Marks
-            </p>
-
-            <p
-              className="
-                mt-0.5
-                text-sm
-                font-black
-                text-slate-700
-              "
-            >
-              {test?.total_mark ||
-                0}
-            </p>
-          </div>
+          <StatBox
+            icon={Trophy}
+            label="Marks"
+            value={
+              test?.total_mark
+            }
+            isPaid={isPaid}
+          />
         </div>
 
-        {/* =================================================
-            ACTION
-        ================================================= */}
-
-        <div className="mt-auto pt-6">
+        <div
+          className="
+            mt-auto
+            pt-6
+          "
+        >
           {isPaid ? (
             <button
               type="button"
@@ -393,10 +282,7 @@ export default function ScertTestCard({
                 font-bold
                 text-amber-800
                 transition-all
-                duration-300
-                hover:-translate-y-0.5
                 hover:bg-amber-200
-                hover:shadow-md
               "
             >
               <LockKeyhole
@@ -424,13 +310,10 @@ export default function ScertTestCard({
                 font-bold
                 text-emerald-800
                 transition-all
-                duration-300
-                hover:-translate-y-0.5
                 hover:bg-emerald-200
-                hover:shadow-md
               "
             >
-              Start Exam
+              View Test
 
               <ArrowRight
                 size={17}
@@ -440,10 +323,6 @@ export default function ScertTestCard({
         </div>
       </article>
 
-      {/* =================================================
-          PREMIUM MODAL
-      ================================================= */}
-
       {showPremiumModal ? (
         <PremiumModal
           onClose={() =>
@@ -452,7 +331,13 @@ export default function ScertTestCard({
             )
           }
           redirectPath={
-            examHref
+            `/kerala-psc-coaching/scert-tests/tests/${testSlug}` +
+            `?classId=${encodeURIComponent(
+              classId
+            )}` +
+            `&examId=${encodeURIComponent(
+              examId
+            )}`
           }
         />
       ) : null}
@@ -460,9 +345,59 @@ export default function ScertTestCard({
   );
 }
 
-/* =========================================================
-   PREMIUM MODAL
-========================================================= */
+function StatBox({
+  icon: Icon,
+  label,
+  value,
+  isPaid,
+}) {
+  return (
+    <div
+      className={`
+        rounded-xl
+        border
+        bg-white/75
+        p-3
+
+        ${
+          isPaid
+            ? "border-amber-100"
+            : "border-emerald-100"
+        }
+      `}
+    >
+      <Icon
+        size={16}
+        className={
+          isPaid
+            ? "text-amber-600"
+            : "text-emerald-600"
+        }
+      />
+
+      <p
+        className="
+          mt-2
+          text-[10px]
+          text-slate-400
+        "
+      >
+        {label}
+      </p>
+
+      <p
+        className="
+          mt-0.5
+          text-sm
+          font-black
+          text-slate-700
+        "
+      >
+        {value ?? 0}
+      </p>
+    </div>
+  );
+}
 
 function PremiumModal({
   onClose,
@@ -477,6 +412,7 @@ function PremiumModal({
 
   return (
     <div
+      onClick={onClose}
       className="
         fixed
         inset-0
@@ -490,6 +426,9 @@ function PremiumModal({
       "
     >
       <div
+        onClick={(event) =>
+          event.stopPropagation()
+        }
         className="
           w-full
           max-w-md
@@ -512,8 +451,6 @@ function PremiumModal({
             items-center
             justify-center
             rounded-2xl
-            border
-            border-amber-200
             bg-amber-100
             text-amber-700
           "
@@ -542,9 +479,8 @@ function PremiumModal({
             text-slate-500
           "
         >
-          Login with us and
-          purchase a plan to
-          access this premium
+          Login and choose a plan
+          to access this premium
           SCERT test.
         </p>
 
@@ -557,15 +493,12 @@ function PremiumModal({
             mt-6
             w-full
             rounded-xl
-            border
-            border-amber-300
             bg-amber-500
             px-5
             py-3.5
             text-sm
             font-bold
             text-white
-            transition-all
             hover:bg-amber-600
           "
         >
@@ -583,8 +516,6 @@ function PremiumModal({
             text-sm
             font-bold
             text-slate-500
-            transition-colors
-            hover:text-slate-700
           "
         >
           Cancel

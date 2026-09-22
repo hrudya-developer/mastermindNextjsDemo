@@ -19,6 +19,43 @@ const USER_ID = 0;
 const MAX_EXAMS = 7;
 
 /* =========================================================
+   CREATE SLUG
+========================================================= */
+
+function createSlug(
+  value = ""
+) {
+  return String(value)
+    .toLowerCase()
+    .trim()
+    .replace(
+      /[^a-z0-9]+/g,
+      "-"
+    )
+    .replace(
+      /^-+|-+$/g,
+      ""
+    );
+}
+
+/* =========================================================
+   GET CATEGORY NAME
+========================================================= */
+
+function getCategoryName(
+  category
+) {
+  return (
+    category?.name ||
+    category?.exam ||
+    category?.title ||
+    category?.category ||
+    category?.subcourse ||
+    ""
+  );
+}
+
+/* =========================================================
    IMAGE URL
 ========================================================= */
 
@@ -33,14 +70,26 @@ function buildImageUrl(
     return "";
   }
 
+  if (
+    String(icon).startsWith(
+      "http"
+    )
+  ) {
+    return String(icon);
+  }
+
   const cleanPath =
-    String(iconPath).replace(
+    String(
+      iconPath
+    ).replace(
       /\/+$/,
       ""
     );
 
   const cleanIcon =
-    String(icon).replace(
+    String(
+      icon
+    ).replace(
       /^\/+/,
       ""
     );
@@ -52,7 +101,9 @@ function buildImageUrl(
    SUB EXAMS GRID
 ========================================================= */
 
-export default function SubExamsGrid() {
+export default function SubExamsGrid({
+  recommendedCoursesSlug = "",
+}) {
   const [
     subExams,
     setSubExams,
@@ -68,6 +119,10 @@ export default function SubExamsGrid() {
     setError,
   ] = useState("");
 
+  /* =========================================================
+     LOAD EXAMS
+  ========================================================= */
+
   useEffect(() => {
     let active = true;
 
@@ -76,24 +131,43 @@ export default function SubExamsGrid() {
         setLoading(true);
         setError("");
 
-        /* =================================================
+        /* =====================================================
            STEP 1
-           GET ALL KERALA PSC CATEGORIES
-        ================================================= */
+           GET PSC LEVELS / CATEGORIES
+        ===================================================== */
+
+        const categoryParams =
+          new URLSearchParams({
+            cid: String(
+              COURSE_ID
+            ),
+
+            uid: String(
+              USER_ID
+            ),
+          });
 
         const categoryResponse =
           await fetch(
-            `/api/exam-category-section?cid=${COURSE_ID}&uid=${USER_ID}`,
+            `/api/exam-category-section?${categoryParams.toString()}`,
             {
               method: "GET",
-              cache: "no-store",
+              cache:
+                "no-store",
             }
           );
 
         const categoryResult =
           await categoryResponse.json();
 
-        if (!categoryResponse.ok) {
+        console.log(
+          "CATEGORY RESPONSE:",
+          categoryResult
+        );
+
+        if (
+          !categoryResponse.ok
+        ) {
           throw new Error(
             categoryResult?.message ||
               "Unable to load exam categories."
@@ -108,7 +182,8 @@ export default function SubExamsGrid() {
             : [];
 
         if (
-          categories.length === 0
+          categories.length ===
+          0
         ) {
           if (active) {
             setSubExams([]);
@@ -117,47 +192,147 @@ export default function SubExamsGrid() {
           return;
         }
 
-        /* =================================================
+        /* =====================================================
            STEP 2
-           FETCH EXAMS FROM EACH CATEGORY
+           CHECK WHETHER WE ARE ON A DYNAMIC CATEGORY PAGE
+        ===================================================== */
+
+        const hasSelectedCategory =
+          Boolean(
+            recommendedCoursesSlug
+          );
+
+        let categoriesToLoad =
+          categories;
+
+        /* =====================================================
+           DYNAMIC PAGE
 
            Example:
-           id 3 -> 10th Level
-           id 2 -> 12th Level
-           id 1 -> Degree Level
-           id 7 -> Nursing
-        ================================================= */
+           slug = "10th-level"
+
+           Find:
+           {
+             id: 3,
+             name: "10th Level"
+           }
+        ===================================================== */
+
+        if (
+          hasSelectedCategory
+        ) {
+          const selectedCategory =
+            categories.find(
+              (category) => {
+                const name =
+                  getCategoryName(
+                    category
+                  );
+
+                return (
+                  createSlug(
+                    name
+                  ) ===
+                  createSlug(
+                    recommendedCoursesSlug
+                  )
+                );
+              }
+            );
+
+          console.log(
+            "SELECTED CATEGORY:",
+            selectedCategory
+          );
+
+          if (
+            !selectedCategory
+          ) {
+            if (active) {
+              setSubExams([]);
+
+              setError(
+                "The selected course could not be found."
+              );
+            }
+
+            return;
+          }
+
+          categoriesToLoad = [
+            selectedCategory,
+          ];
+        }
+
+        /* =====================================================
+           STEP 3
+           FETCH SUB EXAMS
+
+           Root page:
+           → fetch all categories
+
+           Dynamic page:
+           → fetch selected category only
+        ===================================================== */
 
         const requests =
-          categories.map(
-            async (category) => {
+          categoriesToLoad.map(
+            async (
+              category
+            ) => {
               try {
-                const subId =
+                const categoryId =
                   category?.id;
 
-                if (!subId) {
+                if (
+                  !categoryId
+                ) {
                   return [];
                 }
 
+                const params =
+                  new URLSearchParams(
+                    {
+                      cid: String(
+                        COURSE_ID
+                      ),
+
+                      subId:
+                        String(
+                          categoryId
+                        ),
+
+                      uid: String(
+                        USER_ID
+                      ),
+                    }
+                  );
+
                 const response =
                   await fetch(
-                    `/api/sub-exams?cid=${COURSE_ID}&subId=${encodeURIComponent(
-                      subId
-                    )}&uid=${USER_ID}`,
+                    `/api/sub-exams?${params.toString()}`,
                     {
                       method:
                         "GET",
+
                       cache:
                         "no-store",
                     }
                   );
 
-                if (!response.ok) {
-                  return [];
-                }
-
                 const result =
                   await response.json();
+
+                console.log(
+                  `SUB EXAMS CATEGORY ${categoryId}:`,
+                  result
+                );
+
+                if (
+                  !response.ok
+                ) {
+                  return [];
+                }
 
                 const exams =
                   Array.isArray(
@@ -167,28 +342,54 @@ export default function SubExamsGrid() {
                     : [];
 
                 const iconPath =
-                  String(
-                    result?.icon_path ??
-                      ""
+                  result?.icon_path ||
+                  result?.iconPath ||
+                  "";
+
+                const categoryName =
+                  getCategoryName(
+                    category
                   );
 
-                /* =========================================
-                   NORMALIZE EXAM DATA
-
-                   Your SubExamCard currently expects:
-                   exam.imageUrl
-                ========================================= */
+                /* =============================================
+                   NORMALIZE EXAMS
+                ============================================= */
 
                 return exams.map(
                   (exam) => ({
                     ...exam,
 
+                    /* Main PSC course */
+
+                    cid:
+                      COURSE_ID,
+
+                    /* Category / level */
+
                     categoryId:
-                      category?.id,
+                      categoryId,
 
                     categoryName:
-                      category?.name ||
+                      categoryName,
+
+                    categorySlug:
+                      createSlug(
+                        categoryName
+                      ),
+
+                    categoryNameMal:
+                      category?.name_mal ||
+                      category
+                        ?.exam_mal ||
                       "",
+
+                    /* Preserve backend sub id */
+
+                    sub_id:
+                      exam?.sub_id ||
+                      categoryId,
+
+                    /* Image */
 
                     imageUrl:
                       buildImageUrl(
@@ -200,7 +401,9 @@ export default function SubExamsGrid() {
                       ),
                   })
                 );
-              } catch (error) {
+              } catch (
+                error
+              ) {
                 console.error(
                   `Unable to load exams for category ${category?.id}:`,
                   error
@@ -211,6 +414,11 @@ export default function SubExamsGrid() {
             }
           );
 
+        /* =====================================================
+           STEP 4
+           WAIT FOR REQUESTS
+        ===================================================== */
+
         const results =
           await Promise.all(
             requests
@@ -220,51 +428,62 @@ export default function SubExamsGrid() {
           return;
         }
 
-        /* =================================================
-           STEP 3
-           FLATTEN ALL CATEGORY RESULTS
-        ================================================= */
+        /* =====================================================
+           STEP 5
+           COMBINE
+        ===================================================== */
 
         const allExams =
           results.flat();
 
-        /* =================================================
-           STEP 4
+        /* =====================================================
+           STEP 6
            REMOVE DUPLICATES
-        ================================================= */
+        ===================================================== */
 
         const uniqueExams =
           Array.from(
             new Map(
               allExams.map(
                 (exam) => [
-                  String(
-                    exam?.id
-                  ),
+                  `${exam?.categoryId}-${exam?.id}`,
+
                   exam,
                 ]
               )
             ).values()
           );
 
-        /* =================================================
-           STEP 5
-           SHOW ONLY LIMITED RECOMMENDED EXAMS
+        /* =====================================================
+           STEP 7
+           ROOT PAGE VS CATEGORY PAGE
 
-           7 exam cards + 1 register card
-           = 8 cards total
-        ================================================= */
+           Root:
+           only show recommendations
 
-        const recommended =
-          uniqueExams.slice(
-            0,
-            MAX_EXAMS
-          );
+           Category page:
+           show all exams in selected category
+        ===================================================== */
+
+        const finalExams =
+          hasSelectedCategory
+            ? uniqueExams
+            : uniqueExams.slice(
+                0,
+                MAX_EXAMS
+              );
+
+        console.log(
+          "FINAL EXAMS:",
+          finalExams
+        );
 
         setSubExams(
-          recommended
+          finalExams
         );
-      } catch (error) {
+      } catch (
+        error
+      ) {
         console.error(
           "Recommended exams fetch error:",
           error
@@ -274,12 +493,15 @@ export default function SubExamsGrid() {
           setSubExams([]);
 
           setError(
-            "Unable to load exams."
+            error?.message ||
+              "Unable to load exams."
           );
         }
       } finally {
         if (active) {
-          setLoading(false);
+          setLoading(
+            false
+          );
         }
       }
     }
@@ -289,7 +511,9 @@ export default function SubExamsGrid() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [
+    recommendedCoursesSlug,
+  ]);
 
   /* =========================================================
      LOADING
@@ -357,7 +581,8 @@ export default function SubExamsGrid() {
   ========================================================= */
 
   if (
-    subExams.length === 0
+    subExams.length ===
+    0
   ) {
     return (
       <div
@@ -369,12 +594,29 @@ export default function SubExamsGrid() {
           px-5
           py-8
           text-center
-          text-sm
-          text-slate-500
         "
       >
-        No recommended exams are
-        currently available.
+        <p
+          className="
+            text-sm
+            font-bold
+            text-[#0b216c]
+          "
+        >
+          No exams available
+        </p>
+
+        <p
+          className="
+            mt-1
+            text-[12px]
+            text-slate-500
+          "
+        >
+          No exams are
+          currently available
+          for this course.
+        </p>
       </div>
     );
   }
@@ -395,12 +637,14 @@ export default function SubExamsGrid() {
         lg:grid-cols-4
       "
     >
-      {/* EXAM CARDS */}
+      {/* =====================================================
+          EXAM CARDS
+      ===================================================== */}
 
       {subExams.map(
         (exam) => (
           <SubExamCard
-            key={exam?.id}
+            key={`${exam?.categoryId}-${exam?.id}`}
             exam={exam}
           />
         )
@@ -408,7 +652,7 @@ export default function SubExamsGrid() {
 
       {/* =====================================================
           REGISTER WITH US
-      ====================================================== */}
+      ===================================================== */}
 
       <Link
         href="/register"
@@ -508,8 +752,6 @@ export default function SubExamsGrid() {
             flex-col
           "
         >
-          {/* TOP */}
-
           <div
             className="
               flex
@@ -559,8 +801,6 @@ export default function SubExamsGrid() {
               />
             </div>
           </div>
-
-          {/* CONTENT */}
 
           <div className="mt-auto">
             <p

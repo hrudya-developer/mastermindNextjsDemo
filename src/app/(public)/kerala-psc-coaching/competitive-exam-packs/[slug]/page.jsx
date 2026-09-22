@@ -1,12 +1,4 @@
-import Link from "next/link";
-
-import {
-  ArrowLeft,
-} from "lucide-react";
-
-import {
-  notFound,
-} from "next/navigation";
+import { notFound } from "next/navigation";
 
 import {
   getPackageDetails,
@@ -18,6 +10,7 @@ import PackagePriceSection from "./PackagePriceSection";
 import PackageIncludesSection from "./PackageIncludesSection";
 import PackageCoursesSection from "./PackageCoursesSection";
 import PackageFAQ from "./PackageFAQ";
+import PackageDescriptionSection from "./PackageDescriptionSection";
 
 /* =========================================================
    METADATA
@@ -26,8 +19,7 @@ import PackageFAQ from "./PackageFAQ";
 export async function generateMetadata({
   params,
 }) {
-  const { slug } =
-    await params;
+  const { slug } = await params;
 
   const packages =
     await getPackagesList({
@@ -38,7 +30,8 @@ export async function generateMetadata({
   const selectedPackage =
     packages.find(
       (item) =>
-        item.slug === slug
+        String(item?.slug) ===
+        String(slug)
     );
 
   if (!selectedPackage) {
@@ -53,12 +46,17 @@ export async function generateMetadata({
     };
   }
 
+  const title =
+    selectedPackage?.package ||
+    selectedPackage?.title ||
+    "Competitive Exam Package";
+
   return {
     title:
-      `${selectedPackage.package} | Master Mind`,
+      `${title} | MasterMind Academy`,
 
     description:
-      `Explore ${selectedPackage.package}, pricing, validity, included courses and package benefits.`,
+      `Explore ${title}, pricing, validity, included courses and package benefits.`,
 
     alternates: {
       canonical:
@@ -74,8 +72,11 @@ export async function generateMetadata({
 export default async function PackageDetailsPage({
   params,
 }) {
-  const { slug } =
-    await params;
+  const { slug } = await params;
+
+  /* =======================================================
+     GET PACKAGE LIST
+  ======================================================= */
 
   const packages =
     await getPackagesList({
@@ -83,15 +84,24 @@ export default async function PackageDetailsPage({
       cid: 1,
     });
 
+  /* =======================================================
+     FIND SELECTED PACKAGE
+  ======================================================= */
+
   const selectedPackage =
     packages.find(
       (item) =>
-        item.slug === slug
+        String(item?.slug) ===
+        String(slug)
     );
 
-  if (!selectedPackage) {
+  if (!selectedPackage?.id) {
     notFound();
   }
+
+  /* =======================================================
+     GET PACKAGE DETAILS
+  ======================================================= */
 
   const packageData =
     await getPackageDetails({
@@ -105,6 +115,10 @@ export default async function PackageDetailsPage({
     notFound();
   }
 
+  /* =======================================================
+     PAGE
+  ======================================================= */
+
   return (
     <main
       className="
@@ -117,54 +131,60 @@ export default async function PackageDetailsPage({
         lg:py-12
       "
     >
-      <div className="mx-auto max-w-7xl mt-12">
-        {/* <Link
-          href="/kerala-psc-coaching/recommended-courses"
-          className="
-            mb-6
-            inline-flex
-            items-center
-            gap-2
-            text-sm
-            font-bold
-            text-[#164fa5]
-            transition
-            hover:text-[#0b216c]
-          "
-        >
-          <ArrowLeft
-            className="h-4 w-4"
-          />
-
-          All Packages
-        </Link> */}
+      <div
+        className="
+          mx-auto
+          mt-12
+          max-w-7xl
+        "
+      >
+        {/* PACKAGE HERO */}
 
         <PackageHero
           packageData={
             packageData
           }
         />
+        <PackageDescriptionSection
+  description={
+    packageData?.description ||
+    ""
+  }
+/>
+
+        {/* PRICE DETAILS */}
 
         <PackagePriceSection
-          prices={
-            packageData.prices
+          price={
+            packageData?.price
           }
         />
 
+        {/* PACKAGE BENEFITS */}
+
         <PackageIncludesSection
-          contains={
-            packageData.contains
+          features={
+            packageData?.features ||
+            []
           }
         />
+
+        {/* INCLUDED COURSES */}
 
         <PackageCoursesSection
           courses={
-            packageData.courses
+            packageData?.courses ||
+            []
           }
         />
+
+        {/* FAQ */}
+
         <PackageFAQ
-  packageData={packageData}
-/>
+          packageData={
+            packageData
+          }
+        />
       </div>
     </main>
   );

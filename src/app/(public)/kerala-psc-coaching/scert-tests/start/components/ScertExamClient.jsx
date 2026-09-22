@@ -17,6 +17,7 @@ import ScertQuestionList from "./ScertQuestionList";
 import ScertPagination from "./ScertPagination";
 import ScertExamActions from "./ScertExamActions";
 import ScertPauseModal from "./ScertPauseModal";
+import ScertPauseLoginModal from "./ScertPauseLoginModal";
 import ScertFinishModal from "./ScertFinishModal";
 import ScertLoginResultModal from "./ScertLoginResultModal";
 
@@ -58,6 +59,10 @@ export default function ScertExamClient({
     safeDurationMinutes *
     60;
 
+  const isGuest =
+    !uid ||
+    Number(uid) === 0;
+
   /* =========================================================
      STATE
   ========================================================= */
@@ -83,7 +88,8 @@ export default function ScertExamClient({
     pauseId,
     setPauseId,
   ] = useState(
-    initialPauseId || null
+    initialPauseId ||
+      null
   );
 
   const [
@@ -106,9 +112,20 @@ export default function ScertExamClient({
     setSaveError,
   ] = useState("");
 
+  /*
+   * Logged-in pause confirmation.
+   */
   const [
     showPauseModal,
     setShowPauseModal,
+  ] = useState(false);
+
+  /*
+   * Guest pause -> login modal.
+   */
+  const [
+    showPauseLoginModal,
+    setShowPauseLoginModal,
   ] = useState(false);
 
   const [
@@ -129,9 +146,9 @@ export default function ScertExamClient({
   );
 
   /*
-    Prevent duplicate automatic
-    submission when timer reaches 0.
-  */
+   * Prevent duplicate automatic
+   * submission when timer reaches 0.
+   */
 
   const timeoutHandledRef =
     useRef(false);
@@ -203,18 +220,13 @@ export default function ScertExamClient({
 
         [String(
           questionId
-        )]:
-          answer,
+        )]: answer,
       })
     );
   };
 
   /* =========================================================
-     CORRECT ANSWER ARRAY
-
-     Backend expects something like:
-
-     [B, D, C, A, ...]
+     CORRECT ANSWERS
   ========================================================= */
 
   const correctAnswers =
@@ -229,8 +241,6 @@ export default function ScertExamClient({
 
   /* =========================================================
      USER ANSWERS
-
-     Backend sample uses an array.
   ========================================================= */
 
   const userAnswersArray =
@@ -253,7 +263,7 @@ export default function ScertExamClient({
     ]);
 
   /* =========================================================
-     RESULT COUNTS
+     RESULT STATS
   ========================================================= */
 
   const resultStats =
@@ -316,10 +326,6 @@ export default function ScertExamClient({
 
   /* =========================================================
      FORMAT BACKEND ARRAY
-
-     Matches style such as:
-
-     [B, D, C, A]
   ========================================================= */
 
   function formatBackendArray(
@@ -331,7 +337,7 @@ export default function ScertExamClient({
   }
 
   /* =========================================================
-     COMMON PAYLOAD
+     ATTEMPT PAYLOAD
   ========================================================= */
 
   const createAttemptPayload =
@@ -412,11 +418,11 @@ export default function ScertExamClient({
   /* =========================================================
      SAVE ATTEMPT
 
-     First attempt:
-     /create
+     create:
+     /api/exam-attempt/create
 
-     Existing paused attempt:
-     /update
+     update:
+     /api/exam-attempt/update
   ========================================================= */
 
   const saveExamAttempt =
@@ -495,14 +501,9 @@ export default function ScertExamClient({
         ) {
           throw new Error(
             result?.message ||
-              "Unable to save exam"
+              "Unable to save exam."
           );
         }
-
-        /*
-          If create API returns
-          a new pause id, remember it.
-        */
 
         const newPauseId =
           result?.pauseid ||
@@ -529,7 +530,63 @@ export default function ScertExamClient({
     );
 
   /* =========================================================
+     PAUSE BUTTON CLICK
+
+     Guest:
+       show login modal
+
+     Logged user:
+       show pause confirmation
+  ========================================================= */
+
+  const handlePauseClick =
+    useCallback(() => {
+      if (
+        saving ||
+        submitted ||
+        paused ||
+        submitInProgressRef.current
+      ) {
+        return;
+      }
+
+      setSaveError("");
+
+      /*
+       * Guest must login before
+       * progress can be saved.
+       */
+      if (isGuest) {
+        setShowPauseLoginModal(
+          true
+        );
+
+        return;
+      }
+
+      /*
+       * Logged-in user can proceed
+       * to normal pause confirmation.
+       */
+      setShowPauseModal(
+        true
+      );
+    }, [
+      saving,
+      submitted,
+      paused,
+      isGuest,
+    ]);
+
+  /* =========================================================
      PAUSE & EXIT
+
+     This function actually saves
+     the pause attempt.
+
+     Extra uid protection is kept
+     here so a guest can never reach
+     the save API accidentally.
   ========================================================= */
 
   const handlePauseAndExit =
@@ -538,8 +595,27 @@ export default function ScertExamClient({
         if (
           saving ||
           submitted ||
+          paused ||
           submitInProgressRef.current
         ) {
+          return;
+        }
+
+        /*
+         * Safety check.
+         */
+        if (
+          !uid ||
+          Number(uid) === 0
+        ) {
+          setShowPauseModal(
+            false
+          );
+
+          setShowPauseLoginModal(
+            true
+          );
+
           return;
         }
 
@@ -548,17 +624,7 @@ export default function ScertExamClient({
             true;
 
           setSaving(true);
-
           setSaveError("");
-
-          /*
-            Store remaining time.
-
-            If your backend expects
-            milliseconds, change this to:
-
-            remainingSeconds * 1000
-          */
 
           await saveExamAttempt({
             status:
@@ -575,10 +641,9 @@ export default function ScertExamClient({
           );
 
           /*
-            Return to corresponding
-            class tests.
-          */
-
+           * Return to selected
+           * SCERT class.
+           */
           router.push(
             `/kerala-psc-coaching/scert-tests/classes/${classId}`
           );
@@ -602,8 +667,10 @@ export default function ScertExamClient({
         }
       },
       [
+        uid,
         saving,
         submitted,
+        paused,
         saveExamAttempt,
         remainingSeconds,
         router,
@@ -613,10 +680,6 @@ export default function ScertExamClient({
 
   /* =========================================================
      COMPLETE EXAM
-
-     Used by:
-     1. Finish button
-     2. Timer expiry
   ========================================================= */
 
   const completeExam =
@@ -637,7 +700,6 @@ export default function ScertExamClient({
             true;
 
           setSaving(true);
-
           setSaveError("");
 
           await saveExamAttempt({
@@ -669,11 +731,6 @@ export default function ScertExamClient({
               "Your exam has been completed. Login to view your result."
             );
           }
-
-          /*
-            Both timeout and manual
-            finish open login modal.
-          */
 
           setShowLoginModal(
             true
@@ -710,8 +767,7 @@ export default function ScertExamClient({
     if (
       paused ||
       submitted ||
-      remainingSeconds <=
-        0
+      remainingSeconds <= 0
     ) {
       return;
     }
@@ -722,8 +778,7 @@ export default function ScertExamClient({
           setRemainingSeconds(
             (previous) =>
               Math.max(
-                previous -
-                  1,
+                previous - 1,
                 0
               )
           );
@@ -739,13 +794,11 @@ export default function ScertExamClient({
   }, [
     paused,
     submitted,
+    remainingSeconds,
   ]);
 
   /* =========================================================
      TIMER EXPIRED
-
-     This effect runs once when
-     remainingSeconds becomes 0.
   ========================================================= */
 
   useEffect(() => {
@@ -772,7 +825,7 @@ export default function ScertExamClient({
   ]);
 
   /* =========================================================
-     PAGINATION
+     PAGE CHANGE
   ========================================================= */
 
   function handlePageChange(
@@ -780,10 +833,10 @@ export default function ScertExamClient({
   ) {
     if (
       page < 1 ||
-      page >
-        totalPages ||
+      page > totalPages ||
       saving ||
-      submitted
+      submitted ||
+      paused
     ) {
       return;
     }
@@ -800,12 +853,39 @@ export default function ScertExamClient({
   }
 
   /* =========================================================
-     LOGIN
+     RESULT LOGIN
   ========================================================= */
 
-  function handleLogin() {
+  function handleResultLogin() {
     const redirectPath =
-      `/kerala-psc-coaching/scert-tests/tests/${testSlug}`;
+      `/kerala-psc-coaching/scert-tests/tests/${testSlug}` +
+      `?classId=${encodeURIComponent(
+        String(classId || "")
+      )}` +
+      `&examId=${encodeURIComponent(
+        String(
+          exam?.id || ""
+        )
+      )}`;
+
+    router.push(
+      `/login?redirect=${encodeURIComponent(
+        redirectPath
+      )}`
+    );
+  }
+
+  /* =========================================================
+     PAUSE LOGIN
+
+     Return to EXACT current exam
+     start page after login.
+  ========================================================= */
+
+  function handlePauseLogin() {
+    const redirectPath =
+      window.location.pathname +
+      window.location.search;
 
     router.push(
       `/login?redirect=${encodeURIComponent(
@@ -837,6 +917,10 @@ export default function ScertExamClient({
           lg:px-8
         "
       >
+        {/* =====================================================
+            HEADER
+        ===================================================== */}
+
         <ScertExamHeader
           exam={exam}
           remainingSeconds={
@@ -855,6 +939,10 @@ export default function ScertExamClient({
             totalPages
           }
         />
+
+        {/* =====================================================
+            SAVE ERROR
+        ===================================================== */}
 
         {saveError ? (
           <div
@@ -875,6 +963,10 @@ export default function ScertExamClient({
           </div>
         ) : null}
 
+        {/* =====================================================
+            QUESTIONS CARD
+        ===================================================== */}
+
         <div
           className="
             mt-6
@@ -887,6 +979,8 @@ export default function ScertExamClient({
             sm:p-7
           "
         >
+          {/* QUESTION RANGE */}
+
           <div
             className="
               mb-5
@@ -918,14 +1012,11 @@ export default function ScertExamClient({
                   text-[#071f55]
                 "
               >
-                {startIndex +
-                  1}
+                {startIndex + 1}
                 {" - "}
                 {endIndex}
                 {" of "}
-                {
-                  totalQuestions
-                }
+                {totalQuestions}
               </h2>
             </div>
 
@@ -946,6 +1037,10 @@ export default function ScertExamClient({
               answered
             </div>
           </div>
+
+          {/* =================================================
+              QUESTIONS
+          ================================================= */}
 
           <ScertQuestionList
             questions={
@@ -970,6 +1065,10 @@ export default function ScertExamClient({
             }
           />
 
+          {/* =================================================
+              PAGINATION
+          ================================================= */}
+
           <ScertPagination
             currentPage={
               currentPage
@@ -982,9 +1081,14 @@ export default function ScertExamClient({
             }
             disabled={
               saving ||
-              submitted
+              submitted ||
+              paused
             }
           />
+
+          {/* =================================================
+              ACTIONS
+          ================================================= */}
 
           <ScertExamActions
             saving={
@@ -993,11 +1097,16 @@ export default function ScertExamClient({
             submitted={
               submitted
             }
-            onPause={() =>
-              setShowPauseModal(
-                true
-              )
+
+            /*
+             * IMPORTANT:
+             * Don't directly open
+             * ScertPauseModal here.
+             */
+            onPause={
+              handlePauseClick
             }
+
             onFinish={() =>
               setShowFinishModal(
                 true
@@ -1007,6 +1116,10 @@ export default function ScertExamClient({
         </div>
       </div>
 
+      {/* =====================================================
+          LOGGED-IN PAUSE CONFIRMATION
+      ===================================================== */}
+
       <ScertPauseModal
         open={
           showPauseModal
@@ -1014,15 +1127,39 @@ export default function ScertExamClient({
         saving={
           saving
         }
-        onClose={() =>
-          setShowPauseModal(
-            false
-          )
-        }
+        onClose={() => {
+          if (!saving) {
+            setShowPauseModal(
+              false
+            );
+          }
+        }}
         onConfirm={
           handlePauseAndExit
         }
       />
+
+      {/* =====================================================
+          GUEST PAUSE LOGIN
+      ===================================================== */}
+
+      <ScertPauseLoginModal
+        open={
+          showPauseLoginModal
+        }
+        onClose={() =>
+          setShowPauseLoginModal(
+            false
+          )
+        }
+        onLogin={
+          handlePauseLogin
+        }
+      />
+
+      {/* =====================================================
+          FINISH CONFIRMATION
+      ===================================================== */}
 
       <ScertFinishModal
         open={
@@ -1037,11 +1174,13 @@ export default function ScertExamClient({
         totalQuestions={
           totalQuestions
         }
-        onClose={() =>
-          setShowFinishModal(
-            false
-          )
-        }
+        onClose={() => {
+          if (!saving) {
+            setShowFinishModal(
+              false
+            );
+          }
+        }}
         onConfirm={() =>
           completeExam({
             reason:
@@ -1049,6 +1188,10 @@ export default function ScertExamClient({
           })
         }
       />
+
+      {/* =====================================================
+          RESULT LOGIN
+      ===================================================== */}
 
       <ScertLoginResultModal
         open={
@@ -1063,7 +1206,7 @@ export default function ScertExamClient({
           )
         }
         onLogin={
-          handleLogin
+          handleResultLogin
         }
       />
     </main>

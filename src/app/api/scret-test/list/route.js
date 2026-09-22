@@ -1,84 +1,99 @@
 import {
-    NextResponse,
-  } from "next/server";
-  
-  import {
-    getScertTestsByFolder,
-  } from "@/lib/scertHelper";
-  
-  export async function GET(
-    request
-  ) {
-    try {
-      const {
-        searchParams,
-      } = new URL(
-        request.url
+  NextResponse,
+} from "next/server";
+
+import {
+  getScertTestsPage,
+} from "@/lib/scertHelper";
+
+export async function GET(
+  request
+) {
+  try {
+    const {
+      searchParams,
+    } = new URL(
+      request.url
+    );
+
+    const uid =
+      searchParams.get(
+        "uid"
+      ) || "0";
+
+    const classId =
+      searchParams.get(
+        "classId"
+      ) ||
+      searchParams.get(
+        "folderId"
       );
-  
-      const uid =
-        searchParams.get(
-          "uid"
-        ) || "0";
-  
-      const cid =
-        searchParams.get(
-          "cid"
-        ) || "1";
-  
-      const folderId =
-        searchParams.get(
-          "folderId"
-        );
-  
-      const offset =
-        searchParams.get(
-          "offset"
-        ) || "10";
-  
-      if (!folderId) {
-        return NextResponse.json(
-          {
-            status: false,
-            data: [],
-            nextOffset: null,
-            message:
-              "SCERT folder id is required.",
-          },
-          {
-            status: 400,
-          }
-        );
-      }
-  
-      const result =
-        await getScertTestsByFolder({
-          uid,
-          cid,
-          folderId,
-          offset,
-        });
-  
-      return NextResponse.json(
-        result
-      );
-    } catch (error) {
-      console.error(
-        "SCERT list API:",
-        error
-      );
-  
+
+    const filter =
+      searchParams.get(
+        "filter"
+      ) || "0";
+
+    const offset =
+      searchParams.get(
+        "offset"
+      ) || "0";
+
+    if (!classId) {
       return NextResponse.json(
         {
           status: false,
+          view: "",
           data: [],
           nextOffset: null,
           message:
-            "Unable to load SCERT tests.",
+            "SCERT class id is required.",
         },
         {
-          status: 500,
+          status: 400,
         }
       );
     }
+
+    const result =
+      await getScertTestsPage({
+        uid,
+
+        classId,
+
+        filter,
+
+        offset,
+      });
+
+    return NextResponse.json(
+      result,
+      {
+        status:
+          result?.status
+            ? 200
+            : 502,
+      }
+    );
+  } catch (error) {
+    console.error(
+      "SCERT LIST ROUTE:",
+      error
+    );
+
+    return NextResponse.json(
+      {
+        status: false,
+        view: "",
+        data: [],
+        nextOffset: null,
+        message:
+          error?.message ||
+          "Unable to load SCERT tests.",
+      },
+      {
+        status: 500,
+      }
+    );
   }
+}
